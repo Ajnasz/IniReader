@@ -2,7 +2,7 @@
 /*globals require: true*/
 var assert = require('assert');
 var sys = require('sys');
-var inireader = require('./index');
+var inireader = require('inireader');
 
 
 var izeConf = new inireader.IniReader('./ize-unix.ini');
