@@ -4,11 +4,37 @@ IniReader is a small module for nodejs. You can parse .ini configuration files w
 var iniReader = require('./inireader');
 // initialize
 var parser = new iniReader.IniReader('./myconf.ini');
-// get the whole config tree
+// get the config tree
 parser.getBlock();
 // get only a sub section
 parser.getBlock('blockname');
 // get a config value. The blockname is mandantory
 parser.getValue('blockname', 'key');
 
+Using callbacks:
 
+var iniReader = require('./inireader');
+// initialize
+var parser = new iniReader.IniReader('./myconf.ini');
+parser.on('fileParse', function() {
+  // get the config tree
+  this.getBlock();
+  // get only a sub section
+  this.getBlock('blockname');
+  // get a config value. The blockname is mandantory
+  this.getValue('blockname', 'key');
+});
+
+Using async file reading:
+
+var iniReader = require('./inireader', true);
+// initialize
+var parser = new iniReader.IniReader('./myconf.ini');
+parser.on('fileParse', function() {
+  // get the config tree
+  this.getBlock();
+  // get only a sub section
+  this.getBlock('blockname');
+  // get a config value. The blockname is mandantory
+  this.getValue('blockname', 'key');
+});
