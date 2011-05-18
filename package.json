@@ -1,0 +1,12 @@
+{
+  "name": "inireader",
+  "description": "Parse ini files",
+  "url": "https://github.com/Ajnasz/IniReader",
+  "keywords": ["ini", "config", "configuration", "parser"],
+  "author": {
+    "name": "Lajos Koszti",
+    "email": "ajnasz@ajnasz.hu",
+    "url": "http://ajnasz.hu"
+  },
+  "version": "0.1"
+}
