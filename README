@@ -7,9 +7,9 @@ var parser = new iniReader.IniReader('./myconf.ini');
 // get the config tree
 parser.getBlock();
 // get only a sub section
-parser.getBlock('blockname');
+parser.param('blockname');
 // get a config value. The blockname is mandantory
-parser.getValue('blockname', 'key');
+parser.param('blockname.key');
 
 Using callbacks:
 
@@ -20,9 +20,9 @@ parser.on('fileParse', function() {
   // get the config tree
   this.getBlock();
   // get only a sub section
-  this.getBlock('blockname');
+  this.param('blockname');
   // get a config value. The blockname is mandantory
-  this.getValue('blockname', 'key');
+  this.param('blockname.key');
 });
 
 Using async file reading:
@@ -34,7 +34,7 @@ parser.on('fileParse', function() {
   // get the config tree
   this.getBlock();
   // get only a sub section
-  this.getBlock('blockname');
+  this.param('blockname');
   // get a config value. The blockname is mandantory
-  this.getValue('blockname', 'key');
+  this.param('blockname.key');
 });
