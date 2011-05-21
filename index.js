@@ -63,19 +63,30 @@ var fixQuoted = function (str) {
  * @constructor
  */
 var IniReader = function (cfg) {
+  // backward compatibility
+  // in first versions the first argument was the file name and the second was
+  // the async flag
+  if (typeof cfg === 'string') {
+    cfg = {
+      file: cfg
+    };
+    if (typeof arguments[1] === 'boolean') {
+      cfg.async = arguments[1];
+    }
+  }
   cfg = cfg || {};
   this.async = !!cfg.async;
   this.file = cfg.file || null;
 };
 require('util').inherits(IniReader, require('events').EventEmitter);
 /**
-  * Regexp to get the group names
-  */
+ * Regexp to get the group names
+ */
 IniReader.prototype.groupRex = /^\s*\[\s*([^\]]+)\s*\]$/;
 
 /**
-  * Regexp to get key/value pairs
-  */
+ * Regexp to get key/value pairs
+ */
 IniReader.prototype.keyValueRex = /^\s*([^=]*\w)\s*=\s*(.*)\s*$/;
 
 IniReader.prototype.load = IniReader.prototype.init = function (file) {
