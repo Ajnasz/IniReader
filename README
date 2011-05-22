@@ -3,19 +3,27 @@ IniReader is a small module for nodejs. You can parse .ini configuration files w
 // include
 var iniReader = require('./inireader');
 // initialize
-var parser = new iniReader.IniReader('./myconf.ini');
+var parser = new iniReader.IniReader();
+parser.load('./myconf.ini');
 // get the config tree
 parser.getBlock();
 // get only a sub section
 parser.param('blockname');
 // get a config value. The blockname is mandantory
 parser.param('blockname.key');
+// add or update (if exists) config
+// if the block doesn't exists it will be created;
+parser.param('blockname.key', 'foobar');
+// update the config
+parser.write();
+// create a new config
+parser.write('myotherconf.ini');
 
 Using callbacks:
 
 var iniReader = require('./inireader');
 // initialize
-var parser = new iniReader.IniReader('./myconf.ini');
+var parser = new iniReader.IniReader();
 parser.on('fileParse', function() {
   // get the config tree
   this.getBlock();
@@ -23,18 +31,34 @@ parser.on('fileParse', function() {
   this.param('blockname');
   // get a config value. The blockname is mandantory
   this.param('blockname.key');
+  // add or update (if exists) config
+  // if the block doesn't exists it will be created;
+  parser.param('blockname.key', 'foobar');
+  // update the config
+  parser.write();
+  // create a new config
+  parser.write('myotherconf.ini');
 });
+parser.load('./myconf.ini');
 
 Using async file reading:
 
-var iniReader = require('./inireader', true);
+var iniReader = require('./inireader');
 // initialize
-var parser = new iniReader.IniReader('./myconf.ini');
-parser.on('fileParse', function() {
+var parser = new iniReader.IniReader();
+parser.on('fileParse', function({async: true}) {
   // get the config tree
   this.getBlock();
   // get only a sub section
   this.param('blockname');
   // get a config value. The blockname is mandantory
   this.param('blockname.key');
+  // add or update (if exists) config
+  // if the block doesn't exists it will be created;
+  parser.param('blockname.key', 'foobar');
+  // update the config
+  parser.write();
+  // create a new config
+  parser.write('myotherconf.ini');
 });
+parser.load('./myconf.ini');
