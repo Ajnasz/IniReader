@@ -3,6 +3,13 @@
   "description": "Parse ini files",
   "url": "https://github.com/Ajnasz/IniReader",
   "keywords": ["ini", "config", "configuration", "parser"],
+  "repository" : {
+    "type" : "git",
+    "url" : "git://github.com/Ajnasz/IniReader.git"
+  },
+  "bugs": {
+    "web": "https://github.com/Ajnasz/IniReader/issues"
+  },
   "author": {
     "name": "Lajos Koszti",
     "email": "ajnasz@ajnasz.hu",
