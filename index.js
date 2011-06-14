@@ -139,17 +139,15 @@ IniReader.prototype.keyValueMatch = function (line) {
   */
 IniReader.prototype.parseFile = function () {
 
-  var output, lines, skipLineRex, chompRex, trimRex, nonWhitespaceRex,
-      groupName, keyVal, line, currentSection, lineNumber;
+  var output, lines, groupName, keyVal, line, currentSection, lineNumber;
+
+  // regular expressions to clear, validate and get the values
+  const skipLineRex = /^\s*(\n|\#|;)/,
+    chompRex = /(?:\n|\r)$/,
+    nonWhitespaceRex = /\S/;
 
   output = {};
   lines = this.lines;
-
-  // regular expressions to clear, validate and get the values
-  skipLineRex = /^\s*(\n|\#|;)/;
-  chompRex = /(?:\n|\r)$/;
-  trimRex = /^\s+|\s+$/g;
-  nonWhitespaceRex = /\S/;
 
   lineNumber = 0;
 
@@ -162,7 +160,7 @@ IniReader.prototype.parseFile = function () {
     }
 
     line = line.replace(chompRex, '');
-    line = line.replace(trimRex, '');
+    line = line.trim();
 
     // block name
     groupName = this.parseSectionHead(line);
