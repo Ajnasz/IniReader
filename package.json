@@ -1,6 +1,6 @@
 {
   "name": "inireader",
-  "description": "Parse ini files",
+  "description": "Module to create, read and/or change ini configuration files",
   "url": "https://github.com/Ajnasz/IniReader",
   "keywords": ["ini", "config", "configuration", "parser"],
   "repository" : {
