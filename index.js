@@ -89,6 +89,11 @@ IniReader.prototype.groupRex = /^\s*\[\s*([^\]]+)\s*\]$/;
  */
 IniReader.prototype.keyValueRex = /^\s*([^=]*\w)\s*=\s*(.*)\s*$/;
 
+/**
+ * @method load
+ * @param String file
+ * Loads a ini file
+ **/
 IniReader.prototype.load = IniReader.prototype.init = function (file) {
   if (typeof file === 'string') {
     this.file = file;
@@ -229,6 +234,9 @@ IniReader.prototype.getParam = function (param) {
   }
   return output;
 };
+/**
+ * @method setParam
+ */
 IniReader.prototype.setParam = function (prop, value) {
   if (typeof this.values !== 'object') {
     this.values = {};
@@ -249,6 +257,9 @@ IniReader.prototype.setParam = function (prop, value) {
     }, this);
   }
 };
+/**
+ * @method param
+ * **/
 IniReader.prototype.param = function (prop, value) {
   if (typeof value === 'undefined') {
     return this.getParam(prop);
@@ -256,6 +267,7 @@ IniReader.prototype.param = function (prop, value) {
     return this.setParam(prop, value);
   }
 };
+
 IniReader.prototype.getLe = function (le) {
   return typeof le === 'string' && (le === '\n' || le === '\r\n' || le === '\r') ? le : '\n';
 }
@@ -281,6 +293,7 @@ IniReader.prototype.serialize = function (le) {
   }, this);
   return output;
 };
+
 IniReader.prototype.write = function (file, le) {
   if (!file) {
     file = this.file;
