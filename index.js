@@ -190,6 +190,19 @@ IniReader.prototype.parseFile = function () {
     throw new Error("syntax error in line " + lineNumber);
 
   }
+
+  if (output.hasOwnProperty('DEFAULT')) {
+    for (var section in output) {
+      if (section != 'DEFAULT') {
+        for (var key in output['DEFAULT']) {
+          if (!output[section].hasOwnProperty(key)) {
+            output[section][key] = output.DEFAULT[key];
+          }
+        }
+      }
+    }
+  }
+
   return output;
 };
 /**
