@@ -45,8 +45,8 @@ Using async file reading:
 
 var iniReader = require('./inireader');
 // initialize
-var parser = new iniReader.IniReader();
-parser.on('fileParse', function({async: true}) {
+var parser = new iniReader.IniReader({async: true});
+parser.on('fileParse', function() {
   // get the config tree
   this.getBlock();
   // get only a sub section
