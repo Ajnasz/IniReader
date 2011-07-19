@@ -199,7 +199,7 @@ IniReader.prototype.parseFile = function () {
   */
 IniReader.prototype.getBlock = function (block) {
   return typeof block === 'string' ?
-          this.getParam(block) :
+          this.param(block) :
           this.values;
 };
 /**
