@@ -210,7 +210,11 @@ IniReader.prototype.getBlock = function (block) {
   * @deprecated
   */
 IniReader.prototype.getValue = function (block, key) {
-  return this.getParam(block + '.' + key);
+  var param = block;
+  if (typeof key !== 'undefined') {
+    param += '.' + key;
+  }
+  return this.getParam(param);
 };
 /**
   * @method getValue
@@ -229,7 +233,7 @@ IniReader.prototype.getParam = function (param) {
 
   output = this.values[block];
 
-  if (typeof key === 'string') {
+  if (typeof key === 'string' && typeof output !== 'undefined') {
     output = output[key];
   }
   return output;
