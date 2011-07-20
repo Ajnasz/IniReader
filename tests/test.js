@@ -17,6 +17,8 @@
   };
 
   test = function (obj) {
+    assert.equal(typeof(obj.param()), 'object',
+      'empty key doesn\'t returned object');
     assert.equal(typeof(obj.param('doesntexists')), 'undefined',
     'nonexisting key doesn\'t returned undefined');
     assert.equal(typeof(obj.param('foo')), 'object', 'existing key doesn\'t returned an object');
