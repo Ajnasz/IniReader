@@ -196,11 +196,10 @@ IniReader.prototype.parseFile = function () {
   * @method getBlock
   * @returns A block of the conf tree
   * @type Object
+  * @deprecated
   */
 IniReader.prototype.getBlock = function (block) {
-  return typeof block === 'string' ?
-          this.param(block) :
-          this.values;
+  return this.param(block);
 };
 /**
   * @method getValue
@@ -222,20 +221,23 @@ IniReader.prototype.getValue = function (block, key) {
   * @param String param The name of the block where the key should be defined
   */
 IniReader.prototype.getParam = function (param) {
-  param = param.split('.');
-  var block = param[0],
-      key = param[1],
-      output;
+  var output = this.values,
+      block, key;
 
-  if (typeof block !== 'string') {
-    throw new Error('block is not a string');
+  if (param) {
+    param = param.split('.');
+    block = param[0];
+    key = param[1];
   }
 
-  output = this.values[block];
+  if (typeof block === 'string') {
+    output = output[block];
 
-  if (typeof key === 'string' && typeof output !== 'undefined') {
-    output = output[key];
+    if (typeof key === 'string' && typeof output !== 'undefined') {
+      output = output[key];
+    }
   }
+
   return output;
 };
 /**
@@ -275,6 +277,7 @@ IniReader.prototype.param = function (prop, value) {
 IniReader.prototype.getLe = function (le) {
   return typeof le === 'string' && (le === '\n' || le === '\r\n' || le === '\r') ? le : '\n';
 }
+
 IniReader.prototype.serialize = function (le) {
   var output = '',
     group, ws = /\s+/;
@@ -283,6 +286,7 @@ IniReader.prototype.serialize = function (le) {
 
   Object.keys(this.values).forEach(function (group) {
     output += le + '[' + group + ']' + le;
+
     Object.keys(this.values[group]).forEach(function (key) {
       var value = this.values[group][key];
       if (ws.test(value)) {
@@ -325,4 +329,5 @@ IniReader.prototype.write = function (file, le) {
     this.emit('fileWritten', file);
   }
 };
+
 exports.IniReader = IniReader;
