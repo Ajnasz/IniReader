@@ -56,6 +56,34 @@ var fixQuoted = function (str) {
 
 };
 
+var inheritDefault = function(block, _default, key) {
+  var out, _inheritDefault, _key;
+  _default = typeof _default === 'object' ? _default : {};
+
+  if (typeof block !== 'object') {
+    return undefined;
+  }
+
+  _inheritDefault = function(key) {
+    return block.hasOwnProperty(key) ? block[key] : _default[key];
+  };
+
+  if (typeof key === 'string') {
+    out = _inheritDefault(key);
+  } else {
+    out = {};
+    for (_key in block) {
+      out[_key] = block[_key];
+    };
+    for (_key in _default) {
+      out[_key] = _inheritDefault(_key);
+    }
+  }
+
+  return out;
+};
+
+
 /**
  * Parses a .ini file and convert's it's content to a JS object
  * Parser regexps are from the Config::Simple Perl module
@@ -77,6 +105,7 @@ var IniReader = function (cfg) {
   cfg = cfg || {};
   this.async = !!cfg.async;
   this.file = cfg.file || null;
+  this.inheritDefault = !!cfg.inheritDefault;
 };
 require('util').inherits(IniReader, require('events').EventEmitter);
 /**
@@ -191,18 +220,6 @@ IniReader.prototype.parseFile = function () {
 
   }
 
-  if (output.hasOwnProperty('DEFAULT')) {
-    for (var section in output) {
-      if (section != 'DEFAULT') {
-        for (var key in output['DEFAULT']) {
-          if (!output[section].hasOwnProperty(key)) {
-            output[section][key] = output.DEFAULT[key];
-          }
-        }
-      }
-    }
-  }
-
   return output;
 };
 /**
@@ -229,13 +246,13 @@ IniReader.prototype.getValue = function (block, key) {
   return this.getParam(param);
 };
 /**
-  * @method getValue
+  * @method getParam
   * @returns the value of the key
   * @param String param The name of the block where the key should be defined
   */
 IniReader.prototype.getParam = function (param) {
   var output = this.values,
-      block, key;
+      block, key, useDefault;
 
   if (param) {
     param = param.split('.');
@@ -244,10 +261,18 @@ IniReader.prototype.getParam = function (param) {
   }
 
   if (typeof block === 'string') {
-    output = output[block];
-
-    if (typeof key === 'string' && typeof output !== 'undefined') {
-      output = output[key];
+    useDefault = this.inheritDefault && this.values.hasOwnProperty('DEFAULT');
+    if (typeof key === 'string' && typeof output[block] !== 'undefined') {
+      if (useDefault) {
+        output = inheritDefault(output[block], this.values.DEFAULT, key);
+      } else {
+        output = output[block][key];
+      }
+    } else {
+      if (useDefault) {
+        output = inheritDefault(output[block], this.values.DEFAULT);
+      } else
+        output = output[block];
     }
   }
 
@@ -289,7 +314,7 @@ IniReader.prototype.param = function (prop, value) {
 
 IniReader.prototype.getLe = function (le) {
   return typeof le === 'string' && (le === '\n' || le === '\r\n' || le === '\r') ? le : '\n';
-}
+};
 
 IniReader.prototype.serialize = function (le) {
   var output = '',
