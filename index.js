@@ -252,27 +252,43 @@ IniReader.prototype.getValue = function (block, key) {
   */
 IniReader.prototype.getParam = function (param) {
   var output = this.values,
-      block, key, useDefault;
+  block, key,
+  useDefault = this.inheritDefault && this.values.hasOwnProperty('DEFAULT');
 
   if (param) {
     param = param.split('.');
     block = param[0];
     key = param[1];
-  }
 
-  if (typeof block === 'string') {
-    useDefault = this.inheritDefault && this.values.hasOwnProperty('DEFAULT');
-    if (typeof key === 'string' && typeof output[block] !== 'undefined') {
-      if (useDefault) {
-        output = inheritDefault(output[block], this.values.DEFAULT, key);
+    if (typeof block === 'string') {
+      if (typeof key === 'string' && typeof output[block] !== 'undefined') {
+        if (useDefault) {
+          output = inheritDefault(output[block], this.values.DEFAULT, key);
+        } else {
+          output = output[block][key];
+        }
       } else {
-        output = output[block][key];
+        if (useDefault) {
+          output = inheritDefault(output[block], this.values.DEFAULT);
+        } else
+          output = output[block];
       }
-    } else {
-      if (useDefault) {
-        output = inheritDefault(output[block], this.values.DEFAULT);
-      } else
-        output = output[block];
+    }
+  } else if (useDefault) {
+    output = {};
+    for (var section in this.values) {
+      output[section] = {};
+      for (key in this.values[section]) {
+        output[section][key] = this.values[section][key];
+      };
+
+      if (section != 'DEFAULT') {
+        for (key in this.values.DEFAULT) {
+          if (!output[section].hasOwnProperty(key)) {
+            output[section][key] = output.DEFAULT[key];
+          }
+        }
+      }
     }
   }
 
