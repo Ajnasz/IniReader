@@ -12,8 +12,18 @@
   fs = require('fs');
   inireader = require('inireader');
 
-  beginSection = function (s) {
-    sys.puts('-------------- ' + s.toUpperCase() + ' --------------');
+  beginSection = function (s, config) {
+    sys.puts(''
+             + '-------------- '
+             + s.toUpperCase()
+             + (config
+                ? (''
+                   + ' with config '
+                   + require('util').inspect(config)
+                   )
+                : '')
+             + ' --------------'
+            );
   };
 
   test = function (obj) {
@@ -26,9 +36,43 @@
 
     assert.deepEqual(obj.param('foo.lorem'),
       'ipsum', 'lorem\'s key value in foo conf is not ipsum');
+    assert.deepEqual(obj.param().foo.lorem,
+                     'ipsum', 'lorem\'s key value in foo conf is not ipsum');
     assert.deepEqual(obj.param('foo.amet'), '', 'amet\'s value should be an empty string');
     assert.equal(typeof(obj.param('foo.doesntexists')),
       'undefined', 'value which should not exist returned something else then undefined');
+
+
+    // Test of section "DEFAULT" {--
+    assert.deepEqual(obj.param('DEFAULT.test_default'), 'I come from the default section',
+                     'test_default\'s key value in DEFAULT is wrong'
+                    );
+
+    if (obj.inheritDefault) {
+      assert.deepEqual(obj.param('foo.test_default'), 'I come from the default section',
+                       'test_default\'s key value in foo is not inherited from DEFAULT section'
+                      );
+      assert.deepEqual(obj.param().foo.test_default, 'I come from the default section',
+                       'test_default\'s key value in foo is not inherited from DEFAULT section'
+                      );
+      [obj.param().foo.test_default, obj.param('foo.test_default')].forEach(
+        function(_) {
+          assert.deepEqual(_, 'I come from the default section', ''
+                           + 'test_default\'s key value in foo is'
+                           + ' not inherited from DEFAULT section'
+                          );}
+      );
+      [obj.param().bar.test_default, obj.param('bar.test_default')].forEach(
+        function(_) {assert.deepEqual(_, 'I come from bar',
+                                      'test_default\'s key value in bar is not overwrited');}
+      );
+    } else {
+      assert.equal(typeof(obj.param('foo.test_default')), 'undefined',
+                   'value which should not exist returned something else then undefined'
+                  );
+    }
+    // --}
+
 
     assert.deepEqual(obj.param('bar.asdfas'), 'fooobar', 'bad value');
     assert.deepEqual(obj.param('bar.1'), 'lorem ipsum');
@@ -38,27 +82,27 @@
   };
 
 
-  commonTests = function () {
-    beginSection('common test');
+  commonTests = function (config) {
+    beginSection('common test', config);
 
-    var cfg = new inireader.IniReader();
+    var cfg = new inireader.IniReader(config);
     cfg.load('./ize-unix.ini');
     test(cfg);
     sys.puts('unix tests finished');
 
-    cfg = new inireader.IniReader();
+    cfg = new inireader.IniReader(config);
     cfg.load('./ize-dos.ini');
     test(cfg);
     sys.puts('dos tests finished');
 
-    cfg = new inireader.IniReader();
+    cfg = new inireader.IniReader(config);
     cfg.load('./ize-mac.ini');
     test(cfg);
     sys.puts('mac tests finished');
   };
 
-  testCallbacks = function () {
-    beginSection('start callback test');
+  testCallbacks = function (config) {
+    beginSection('start callback test', config);
 
     var cfg = new inireader.IniReader();
     cfg.on('fileParse', function () {
@@ -160,6 +204,7 @@
 
   // run tests
   commonTests();
+  commonTests({inheritDefault: true});
   testCallbacks();
   testFileRead();
   testAsync();
