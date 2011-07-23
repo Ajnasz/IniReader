@@ -56,33 +56,20 @@ var fixQuoted = function (str) {
 
 };
 
-var inheritDefault = function(block, _default, key) {
-  var out, _inheritDefault, _key;
+var inheritDefault = function (block, _default) {
+  var _inheritDefault, _key;
   _default = typeof _default === 'object' ? _default : {};
 
-  if (typeof block !== 'object') {
-    return undefined;
-  }
-
-  _inheritDefault = function(key) {
-    return block.hasOwnProperty(key) ? block[key] : _default[key];
-  };
-
-  if (typeof key === 'string') {
-    out = _inheritDefault(key);
-  } else {
-    out = {};
-    for (_key in block) {
-      out[_key] = block[_key];
-    };
+  if (typeof block === 'object') {
     for (_key in _default) {
-      out[_key] = _inheritDefault(_key);
+      if (!(_key in block)) {
+        block[_key] = _default[_key];
+      }
     }
   }
 
-  return out;
+  return block;
 };
-
 
 /**
  * Parses a .ini file and convert's it's content to a JS object
@@ -176,7 +163,7 @@ IniReader.prototype.parseFile = function () {
   var output, lines, groupName, keyVal, line, currentSection, lineNumber;
 
   // regular expressions to clear, validate and get the values
-  const skipLineRex = /^\s*(\n|\#|;)/,
+  var skipLineRex = /^\s*(\n|\#|;)/,
     chompRex = /(?:\n|\r)$/,
     nonWhitespaceRex = /\S/;
 
@@ -252,42 +239,26 @@ IniReader.prototype.getValue = function (block, key) {
   */
 IniReader.prototype.getParam = function (param) {
   var output = this.values,
-  block, key,
-  useDefault = this.inheritDefault && this.values.hasOwnProperty('DEFAULT');
+  block, key, _block;
+
+  if (this.inheritDefault && output.hasOwnProperty('DEFAULT')) {
+    for (_block in output) {
+      if (output.hasOwnProperty(_block)) {
+        output[_block] = inheritDefault(output[_block], output.DEFAULT);
+      }
+    }
+  }
 
   if (param) {
     param = param.split('.');
     block = param[0];
     key = param[1];
 
-    if (typeof block === 'string') {
-      if (typeof key === 'string' && typeof output[block] !== 'undefined') {
-        if (useDefault) {
-          output = inheritDefault(output[block], this.values.DEFAULT, key);
-        } else {
-          output = output[block][key];
-        }
-      } else {
-        if (useDefault) {
-          output = inheritDefault(output[block], this.values.DEFAULT);
-        } else
-          output = output[block];
-      }
-    }
-  } else if (useDefault) {
-    output = {};
-    for (var section in this.values) {
-      output[section] = {};
-      for (key in this.values[section]) {
-        output[section][key] = this.values[section][key];
-      };
+    if (block) {
+      output = output[block];
 
-      if (section != 'DEFAULT') {
-        for (key in this.values.DEFAULT) {
-          if (!output[section].hasOwnProperty(key)) {
-            output[section][key] = output.DEFAULT[key];
-          }
-        }
+      if (key) {
+        output = output[key];
       }
     }
   }
