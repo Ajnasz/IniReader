@@ -1,5 +1,12 @@
 /*jslint indent: 2*/
 /*globals require: true*/
+// regular expressions to clear, validate and get the values
+const skipLineRex = /^\s*(\n|\#|;)/,
+  chompRex = /(?:\n|\r)$/,
+  nonWhitespaceRex = /\S/,
+  interPolationRexG = /%\(.*?\)/g,
+  interPolationRex = /%\((.*?)\)/;
+
 
 var getLines = function (file, cb, async) {
   var fs = require('fs'), splitLines, data;
@@ -177,11 +184,6 @@ IniReader.prototype.keyValueMatch = function (line) {
 IniReader.prototype.parseFile = function () {
 
   var output, lines, groupName, keyVal, line, currentSection, lineNumber;
-
-  // regular expressions to clear, validate and get the values
-  var skipLineRex = /^\s*(\n|\#|;)/,
-    chompRex = /(?:\n|\r)$/,
-    nonWhitespaceRex = /\S/;
 
   output = {};
   lines = this.lines;
@@ -419,10 +421,10 @@ IniReader.prototype.interpolate = function (param) {
     }
   } else {
     if (typeof output === 'string') {
-      references = output.match(/%\(.*?\)/g);
+      references = output.match(interPolationRexG);
       references && references.forEach(
         function(reference) {
-          var refKey = reference.replace(/%\((.*?)\)/, '$1');
+          var refKey = reference.replace(interPolationRex, '$1');
           refParams = refKey.split('.');
           if (refParams.length < 2) { // interpolation in current block
             refParam = block + '.' + refParams[0];
