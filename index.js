@@ -83,6 +83,22 @@ var inheritDefault = function(block, _default, key) {
   return out;
 };
 
+/**
+ * return a deep copy of the object o
+ */
+var deepCopy = function(o, c) {
+  var out = c || {};
+  for (var key in o) {
+    if (typeof o[key] === 'object') {
+      out[key] = (o[key].constructor === Array ? [] : {});
+      deepCopy(o[key], out[key]);
+    } else {
+      out[key] = o[key];
+    }
+  };
+  return out;
+};
+
 
 /**
  * Parses a .ini file and convert's it's content to a JS object
@@ -326,6 +342,48 @@ IniReader.prototype.param = function (prop, value) {
   } else {
     return this.setParam(prop, value);
   }
+};
+
+IniReader.prototype.interpolate = function(param) {
+  var output = this.getParam(param),
+    block, key, refParams, refParam, references;
+  var self = this;
+
+  if (typeof output === 'object') {
+    output = deepCopy(output);
+  }
+
+  if (param) {
+    param = param.split('.');
+    block = param[0];
+    key = param[1];
+  }
+
+  if (typeof key == 'undefined' || !param) {
+    for (block in output) {
+      for (key in output[block]) {
+        output[block][key] = this.interpolate(block + '.' + key);
+      }
+    }
+  } else {
+    if (typeof output === 'string') {
+      references = output.match(/%\(.*?\)/g);
+      references && references.forEach(
+        function(reference) {
+          var refKey = reference.replace(/%\((.*?)\)/, '$1');
+          refParams = refKey.split('.');
+          if (refParams.length < 2) { // interpolation in current block
+            refParam = block + '.' + refParams[0];
+          } else {
+            refParam = refKey;
+          }
+          output = output.replace(reference, self.interpolate(refParam));
+        }
+      );
+    }
+  }
+
+  return output;
 };
 
 IniReader.prototype.getLe = function (le) {

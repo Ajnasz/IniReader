@@ -27,58 +27,76 @@
   };
 
   test = function (obj) {
-    assert.equal(typeof(obj.param()), 'object',
-      'empty key doesn\'t returned object');
-    assert.equal(typeof(obj.param('doesntexists')), 'undefined',
-    'nonexisting key doesn\'t returned undefined');
-    assert.equal(typeof(obj.param('foo')), 'object', 'existing key doesn\'t returned an object');
-    assert.equal(typeof(obj.param('bar')), 'object', 'existing key doesn\'t returned an object');
+    ['param', 'interpolate'].forEach(function(fnGet) {
+      assert.equal(typeof(obj[fnGet]()), 'object',
+                   'empty key doesn\'t returned object');
+      assert.equal(typeof(obj[fnGet]('doesntexists')), 'undefined',
+                   'nonexisting key doesn\'t returned undefined');
+      assert.equal(typeof(obj[fnGet]('foo')), 'object', 'existing key doesn\'t returned an object');
+      assert.equal(typeof(obj[fnGet]('bar')), 'object', 'existing key doesn\'t returned an object');
 
-    assert.deepEqual(obj.param('foo.lorem'),
-      'ipsum', 'lorem\'s key value in foo conf is not ipsum');
-    assert.deepEqual(obj.param().foo.lorem,
-                     'ipsum', 'lorem\'s key value in foo conf is not ipsum');
-    assert.deepEqual(obj.param('foo.amet'), '', 'amet\'s value should be an empty string');
-    assert.equal(typeof(obj.param('foo.doesntexists')),
-      'undefined', 'value which should not exist returned something else then undefined');
+      assert.deepEqual(obj[fnGet]('foo.lorem'),
+                       'ipsum', 'lorem\'s key value in foo conf is not ipsum');
+      assert.deepEqual(obj[fnGet]().foo.lorem,
+                       'ipsum', 'lorem\'s key value in foo conf is not ipsum');
+      assert.deepEqual(obj[fnGet]('foo.amet'), '', 'amet\'s value should be an empty string');
+      assert.equal(typeof(obj[fnGet]('foo.doesntexists')),
+                   'undefined', 'value which should not exist returned something else then undefined');
 
 
-    // Test of section "DEFAULT" {--
-    assert.deepEqual(obj.param('DEFAULT.test_default'), 'I come from the default section',
-                     'test_default\'s key value in DEFAULT is wrong'
+      // Test of section "DEFAULT" {--
+      assert.deepEqual(obj[fnGet]('DEFAULT.test_default'), 'I come from the default section',
+                       'test_default\'s key value in DEFAULT is wrong'
+                      );
+
+      if (obj.inheritDefault) {
+        assert.deepEqual(obj[fnGet]('foo.test_default'), 'I come from the default section',
+                         'test_default\'s key value in foo is not inherited from DEFAULT section'
+                        );
+        assert.deepEqual(obj[fnGet]().foo.test_default, 'I come from the default section',
+                         'test_default\'s key value in foo is not inherited from DEFAULT section'
+                        );
+        [obj[fnGet]().foo.test_default, obj[fnGet]('foo.test_default')].forEach(
+          function(_) {
+            assert.deepEqual(_, 'I come from the default section', ''
+                             + 'test_default\'s key value in foo is'
+                             + ' not inherited from DEFAULT section'
+                            );}
+        );
+        [obj[fnGet]().bar.test_default, obj[fnGet]('bar.test_default')].forEach(
+          function(_) {assert.deepEqual(_, 'I come from bar',
+                                        'test_default\'s key value in bar is not overwrited');}
+        );
+      } else {
+        assert.equal(typeof(obj[fnGet]('foo.test_default')), 'undefined',
+                     'value which should not exist returned something else then undefined'
                     );
+      }
+      // --}
 
-    if (obj.inheritDefault) {
-      assert.deepEqual(obj.param('foo.test_default'), 'I come from the default section',
-                       'test_default\'s key value in foo is not inherited from DEFAULT section'
-                      );
-      assert.deepEqual(obj.param().foo.test_default, 'I come from the default section',
-                       'test_default\'s key value in foo is not inherited from DEFAULT section'
-                      );
-      [obj.param().foo.test_default, obj.param('foo.test_default')].forEach(
-        function(_) {
-          assert.deepEqual(_, 'I come from the default section', ''
-                           + 'test_default\'s key value in foo is'
-                           + ' not inherited from DEFAULT section'
-                          );}
-      );
-      [obj.param().bar.test_default, obj.param('bar.test_default')].forEach(
-        function(_) {assert.deepEqual(_, 'I come from bar',
-                                      'test_default\'s key value in bar is not overwrited');}
-      );
-    } else {
-      assert.equal(typeof(obj.param('foo.test_default')), 'undefined',
-                   'value which should not exist returned something else then undefined'
-                  );
-    }
+
+      assert.deepEqual(obj[fnGet]('bar.asdfas'), 'fooobar', 'bad value');
+      assert.deepEqual(obj[fnGet]('bar.1'), 'lorem ipsum');
+      assert.deepEqual(obj[fnGet]('bar.2'), '  lorem ipsum');
+      assert.deepEqual(obj[fnGet]('bar.3'), 'lorem ipsum');
+      assert.deepEqual(obj[fnGet]('bar.4'), 'lorem ipsum  ');
+    });
+
+    // Test the interpolations {--
+    assert.deepEqual(obj.interpolate('foo.interpolate'), 'sittercity', 'Interpolation is wrong');
+      if (obj.inheritDefault) {
+        assert.deepEqual(obj.interpolate('foo.interpolate_default'),
+                         'I come from the default section / interpolation',
+                         'Interpolation with inheritance from block "DEFAULT" is wrong');
+        assert.deepEqual(obj.interpolate('bar.interpolate_block_recursive'),
+                        'I come from bar / block interpolation / recursive',
+                        'Interpolation wiht inheritance from block "DEFAULT" and recursion is wrong');
+      }
+    assert.deepEqual(obj.interpolate('foo.interpolate_block'),
+                     'I come from bar / block interpolation',
+                     'Interpolation from other block is wrong');
+
     // --}
-
-
-    assert.deepEqual(obj.param('bar.asdfas'), 'fooobar', 'bad value');
-    assert.deepEqual(obj.param('bar.1'), 'lorem ipsum');
-    assert.deepEqual(obj.param('bar.2'), '  lorem ipsum');
-    assert.deepEqual(obj.param('bar.3'), 'lorem ipsum');
-    assert.deepEqual(obj.param('bar.4'), 'lorem ipsum  ');
   };
 
 
