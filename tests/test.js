@@ -76,6 +76,8 @@
 
     // Test the interpolations {--
     assert.deepEqual(obj.interpolate('foo.interpolate'), 'sittercity', 'Interpolation is wrong');
+    assert.deepEqual(obj.interpolate('foo.interpolate_block2'),
+      'ipsumfooobar', 'Interpolation is wrong');
     if (obj.inheritDefault) {
       assert.deepEqual(obj.interpolate('foo.interpolate_default'),
         'I come from the default section / interpolation',
