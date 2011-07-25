@@ -5,4 +5,4 @@ test: oldtest
 oldtest:
 	@echo '========== OLD TESTS =========='
 	node ./test-old.js
-.PHONY: old
+.PHONY: oldtest test
