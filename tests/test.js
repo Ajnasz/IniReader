@@ -28,7 +28,11 @@
       assert.deepEqual(obj[fnGet]('foo.lorem'), 'ipsum',
         "lorem's key value in foo conf is not ipsum");
       assert.deepEqual(obj[fnGet]().foo.lorem, 'ipsum',
-        "lorem's key value in foo conf is not ipsum");
+        "lorem's key value in foo conf is not ipsum when "
+                      + fnGet + ' is called without argument');
+      assert.deepEqual(obj[fnGet]('foo').lorem, 'ipsum',
+        "lorem's key value in foo conf is not ipsum when "
+                      + fnGet + ' is called with argument foo');
       assert.deepEqual(obj[fnGet]('foo.amet'), '', "amet's value should be an empty string");
       assert.equal(typeof(obj[fnGet]('foo.doesntexists')), 'undefined',
         'value which should not exist returned something else then undefined');
@@ -66,7 +70,6 @@
       }
       // --}
 
-
       assert.deepEqual(obj[fnGet]('bar.asdfas'), 'fooobar', 'bad value');
       assert.deepEqual(obj[fnGet]('bar.1'), 'lorem ipsum');
       assert.deepEqual(obj[fnGet]('bar.2'), '  lorem ipsum');
@@ -75,20 +78,33 @@
     });
 
     // Test the interpolations {--
-    assert.deepEqual(obj.interpolate('foo.interpolate'), 'sittercity', 'Interpolation is wrong');
+    assert.deepEqual(obj.interpolate('foo.interpolate'), 'sittercity',
+                     'Interpolation is wrong');
+    assert.deepEqual(obj.interpolate().foo.interpolate, 'sittercity',
+                     'Interpolation without arguments is wrong');
+    assert.deepEqual(obj.interpolate('foo').interpolate, 'sittercity',
+                     'Interpolation with block as argument is wrong');
     assert.deepEqual(obj.interpolate('foo.interpolate_block2'),
-      'ipsumfooobar', 'Interpolation is wrong');
+                     'ipsumfooobar', 'Interpolation is wrong');
     if (obj.inheritDefault) {
       assert.deepEqual(obj.interpolate('foo.interpolate_default'),
-        'I come from the default section / interpolation',
-        'Interpolation with inheritance from block "DEFAULT" is wrong');
+                       'I come from the default section / interpolation',
+                       'Interpolation with inheritance from block "DEFAULT" is wrong');
+      assert.deepEqual(obj.interpolate().foo.interpolate_default,
+                       'I come from the default section / interpolation',
+                       'Interpolation without arguments and with inheritance from current block'
+                       + ' "DEFAULT" is wrong');
+      assert.deepEqual(obj.interpolate('foo').interpolate_default,
+                       'I come from the default section / interpolation',
+                       'Interpolation with block as argument and with inheritance from current block'
+                       + ' "DEFAULT" is wrong');
       assert.deepEqual(obj.interpolate('bar.interpolate_block_recursive'),
-        'I come from bar / block interpolation / recursive',
-        'Interpolation wiht inheritance from block "DEFAULT" and recursion is wrong');
+                       'I come from bar / block interpolation / recursive',
+                       'Interpolation wiht inheritance from block "DEFAULT" and recursion is wrong');
     }
     assert.deepEqual(obj.interpolate('foo.interpolate_block'),
-      'I come from bar / block interpolation',
-      'Interpolation from other block is wrong');
+                     'I come from bar / block interpolation',
+                     'Interpolation from other block is wrong');
 
     // --}
   };

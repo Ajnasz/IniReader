@@ -279,7 +279,7 @@ IniReader.prototype.setDefaultValue = function (currentValue, block, key) {
   */
 IniReader.prototype.getParam = function (param) {
   var output = this.values,
-  block, key, _block;
+  block, key;
 
   if (param) {
     param = param.split('.');
@@ -391,8 +391,6 @@ IniReader.prototype.write = function (file, le) {
   }
 };
 
-
-
 IniReader.prototype.interpolate = function (param) {
   var output = this.getParam(param),
       self = this,
@@ -400,45 +398,53 @@ IniReader.prototype.interpolate = function (param) {
       _block, _key;
 
 
-  if (typeof output === 'object') {
-    output = deepCopy(output);
-  }
-  if (param) {
-    param = param.split('.');
-    block = param[0];
-    key = param[1];
-  }
+  if (typeof output !== 'undefined') {
+    if (typeof output === 'object') {
+      output = deepCopy(output);
+    }
+    if (param) {
+      param = param.split('.');
+      block = param[0];
+      key = param[1];
+    }
 
-  if (typeof key === 'undefined' || !param) {
-    for (_block in output) {
-      if (output.hasOwnProperty(_block)) {
-        for (_key in output[block]) {
-          if (output[_block].hasOwnProperty(_key)) {
-            output[_block][_key] = this.interpolate(_block + '.' + _key);
+    if (typeof block === 'undefined') { // no argument given
+      for (_block in output) {
+        if (output.hasOwnProperty(_block)) {
+          for (_key in output[_block]) {
+            if (output[_block].hasOwnProperty(_key)) {
+              output[_block][_key] = this.interpolate(_block + '.' + _key);
+            }
           }
         }
       }
-    }
-  } else {
-    if (typeof output === 'string') {
-      references = output.match(interPolationRexG);
-      references && references.forEach(
-        function(reference) {
-          var refKey = reference.replace(interPolationRex, '$1');
-          refParams = refKey.split('.');
-          if (refParams.length < 2) { // interpolation in current block
-            refParam = block + '.' + refParams[0];
-          } else {
-            refParam = refKey;
+    } else { // argument is block or block.key
+      if (typeof key === 'undefined') { // argument is block
+        for (_key in output) {
+          if (output.hasOwnProperty(_key)) {
+            output[_key] = this.interpolate(block + '.' + _key);
           }
-          output = output.replace(reference, self.interpolate(refParam));
         }
-      );
+      } else { // argument is block.key
+        if (typeof output === 'string') {
+          references = output.match(interPolationRexG);
+          references && references.forEach(
+            function(reference) {
+              var refKey = reference.replace(interPolationRex, '$1');
+              refParams = refKey.split('.');
+              if (refParams.length < 2) { // interpolation in current block
+                refParam = block + '.' + refParams[0];
+              } else {
+                refParam = refKey;
+              }
+              output = output.replace(reference, self.interpolate(refParam));
+            }
+          );
+        }
+      }
     }
   }
-
   return output;
 };
-
 
 exports.IniReader = IniReader;
