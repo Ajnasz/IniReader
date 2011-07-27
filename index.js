@@ -1,12 +1,13 @@
 /*jslint indent: 2*/
-/*globals require: true*/
+/*globals require: true, exports: true*/
 // regular expressions to clear, validate and get the values
-const skipLineRex = /^\s*(\n|\#|;)/,
+var skipLineRex = /^\s*(\n|\#|;)/,
   chompRex = /(?:\n|\r)$/,
   nonWhitespaceRex = /\S/,
+  keyValueRex = /^\s*([^=]*\w)\s*=\s*(.*)\s*$/,
+  groupRex = /^\s*\[\s*([^\]]+)\s*\]$/,
   interPolationRexG = /%\(.*?\)/g,
   interPolationRex = /%\((.*?)\)/;
-
 
 var getLines = function (file, cb, async) {
   var fs = require('fs'), splitLines, data;
@@ -68,11 +69,11 @@ var inheritDefault = function (block, _default) {
   _default = typeof _default === 'object' ? _default : {};
 
   if (typeof block === 'object') {
-    for (_key in _default) {
+    Object.keys(_default).forEach(function (_key) {
       if (!(_key in block)) {
         block[_key] = _default[_key];
       }
-    }
+    });
   }
 
   return block;
@@ -90,7 +91,7 @@ var deepCopy = function (o, c) {
     } else {
       out[key] = o[key];
     }
-  };
+  }
   return out;
 };
 
@@ -118,15 +119,6 @@ var IniReader = function (cfg) {
   this.inheritDefault = !!cfg.inheritDefault;
 };
 require('util').inherits(IniReader, require('events').EventEmitter);
-/**
- * Regexp to get the group names
- */
-IniReader.prototype.groupRex = /^\s*\[\s*([^\]]+)\s*\]$/;
-
-/**
- * Regexp to get key/value pairs
- */
-IniReader.prototype.keyValueRex = /^\s*([^=]*\w)\s*=\s*(.*)\s*$/;
 
 /**
  * @method load
@@ -160,7 +152,7 @@ IniReader.prototype.load = IniReader.prototype.init = function (file) {
   * @returns the group name if found or false
   */
 IniReader.prototype.parseSectionHead = function (line) {
-  var groupMatch = line.match(this.groupRex);
+  var groupMatch = line.match(groupRex);
   return groupMatch ? groupMatch[1] : false;
 };
 
@@ -171,7 +163,7 @@ IniReader.prototype.parseSectionHead = function (line) {
   * @returns the key value pair in an object ({key: 'key', value;'value'}) if found or false
   */
 IniReader.prototype.keyValueMatch = function (line) {
-  var keyValMatch = line.match(this.keyValueRex);
+  var keyValMatch = line.match(keyValueRex);
   return keyValMatch ? {key: keyValMatch[1], value: keyValMatch[2]} : false;
 };
 
@@ -262,11 +254,11 @@ IniReader.prototype.setDefaultValue = function (currentValue, block, key) {
         output = inheritDefault(currentValue, defaultValues);
       }
     } else {
-      for (_block in currentValue) {
-        if (_block !== 'DEFAULT' && currentValue.hasOwnProperty(_block)) {
+      Object.keys(currentValue).forEach(function (_block) {
+        if (_block !== 'DEFAULT') {
           output[_block] = inheritDefault(currentValue[_block], defaultValues);
         }
-      }
+      });
     }
   }
   return output;
@@ -397,7 +389,6 @@ IniReader.prototype.interpolate = function (param) {
       block, key, refParams, refParam, references,
       _block, _key;
 
-
   if (typeof output !== 'undefined') {
     if (typeof output === 'object') {
       output = deepCopy(output);
@@ -409,27 +400,21 @@ IniReader.prototype.interpolate = function (param) {
     }
 
     if (typeof block === 'undefined') { // no argument given
-      for (_block in output) {
-        if (output.hasOwnProperty(_block)) {
-          for (_key in output[_block]) {
-            if (output[_block].hasOwnProperty(_key)) {
-              output[_block][_key] = this.interpolate(_block + '.' + _key);
-            }
-          }
-        }
-      }
+      Object.keys(output).forEach(function (_block) {
+        Object.keys(output[_block]).forEach(function (_key) {
+          output[_block][_key] = self.interpolate(_block + '.' + _key);
+        });
+      });
     } else { // argument is block or block.key
       if (typeof key === 'undefined') { // argument is block
-        for (_key in output) {
-          if (output.hasOwnProperty(_key)) {
-            output[_key] = this.interpolate(block + '.' + _key);
-          }
-        }
+        Object.keys(output).forEach(function (_key) {
+          output[_key] = self.interpolate(block + '.' + _key);
+        });
       } else { // argument is block.key
         if (typeof output === 'string') {
           references = output.match(interPolationRexG);
-          references && references.forEach(
-            function(reference) {
+          if (references) {
+            references.forEach(function (reference) {
               var refKey = reference.replace(interPolationRex, '$1');
               refParams = refKey.split('.');
               if (refParams.length < 2) { // interpolation in current block
@@ -438,8 +423,8 @@ IniReader.prototype.interpolate = function (param) {
                 refParam = refKey;
               }
               output = output.replace(reference, self.interpolate(refParam));
-            }
-          );
+            });
+          }
         }
       }
     }
