@@ -33,7 +33,7 @@ Method to get or set a configuration value, or a section or the whole configurat
 
 #### Arguments: ####
 * prop: (Optional), String, The name of the property or block. If the argument is empty, it will return the whole configuration object. To retreive a block, give the name of the block. `iniReaderInstance.param('blockname')`. To retreive a property value, give the name of the block and the property name concatenated witha a dot: `blockname.propertyname`.
-* value: (Optional), String,Number,Object, The value of the parameter. Pass an object to add several prooperties to a section
+* value: (Optional), String,Number,Object, The value of the parameter. Pass an object to add several properties to a section
 
 ## Basic usage ##
 
