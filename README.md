@@ -1,8 +1,10 @@
 IniReader is a small module for nodejs. You can parse .ini configuration files with it.
 
 ## The constructor ##
-Params:
+### Arguments ###
+
 The constructor accepts configuration parameters as an object:
+
 * async: (Optional), Boolean, default: true, Set to true if you wan't to use asynchron calls to read and/or write configuration files
 * file: (Optional), String, default: empty, You can set the configuration file name here
 * inheritDefault: (Optional), String, default: false, If this option is true and your configuration has a section with a name `DEFAULT` the other sections will inherit it's values if they are not defined.
@@ -17,6 +19,7 @@ Loads and parses the configuration file.
 #### Arguments: ####
 * file: (Optional), String, Name of the configuration file to read. If you didn't set the file name in the constructor, you must do it here.
 
+
 ### write ###
 Writes out the configuration into a file
 
@@ -24,12 +27,13 @@ Writes out the configuration into a file
 * file: (Optional), String, Name of the configuration file to write. If you didn't set the file name in the constructor, you must do it here.
 * le: (Optional), String, default: '\n', Line ending. Possible values are: '\n', '\r\n', '\r'
 
+
 ### param ###
 Method to get or set a configuration value, or a section or the whole configuration as an object
 
 #### Arguments: ####
-prop: (Optional), String, The name of the property or block. If the argument is empty, it will return the whole configuration object. To retreive a block, give the name of the block. `iniReaderInstance.param('blockname')`. To retreive a property value, give the name of the block and the property name concatenated witha a dot: `blockanem.propertyname`.
-value: (Optional), String,Number,Object, The value of the parameter. Pass an object to add several prooperties to a section
+* prop: (Optional), String, The name of the property or block. If the argument is empty, it will return the whole configuration object. To retreive a block, give the name of the block. `iniReaderInstance.param('blockname')`. To retreive a property value, give the name of the block and the property name concatenated witha a dot: `blockname.propertyname`.
+* value: (Optional), String,Number,Object, The value of the parameter. Pass an object to add several prooperties to a section
 
 ## Basic usage ##
 
