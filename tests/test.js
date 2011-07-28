@@ -19,22 +19,22 @@
 
   test = function (obj) {
     ['param', 'interpolate'].forEach(function (fnGet) {
-      assert.equal(typeof(obj[fnGet]()), 'object', "empty key doesn't returned object");
-      assert.equal(typeof(obj[fnGet]('doesntexists')), 'undefined',
+      assert.deepEqual(typeof(obj[fnGet]()), 'object', "empty key doesn't returned object");
+      assert.deepEqual(typeof(obj[fnGet]('doesntexists')), 'undefined',
                     "nonexisting key doesn't returned undefined");
-      assert.equal(typeof(obj[fnGet]('foo')), 'object', "existing key doesn't returned an object");
-      assert.equal(typeof(obj[fnGet]('bar')), 'object', "existing key doesn't returned an object");
+      assert.deepEqual(typeof(obj[fnGet]('foo')), 'object', "key doesn't returned an object");
+      assert.deepEqual(typeof(obj[fnGet]('bar')), 'object', "key doesn't returned an object");
 
       assert.deepEqual(obj[fnGet]('foo.lorem'), 'ipsum',
         "lorem's key value in foo conf is not ipsum");
       assert.deepEqual(obj[fnGet]().foo.lorem, 'ipsum',
-        "lorem's key value in foo conf is not ipsum when "
-                      + fnGet + ' is called without argument');
+        "lorem's key value in foo conf is not ipsum when " +
+          fnGet + ' is called without argument');
       assert.deepEqual(obj[fnGet]('foo').lorem, 'ipsum',
-        "lorem's key value in foo conf is not ipsum when "
-                      + fnGet + ' is called with argument foo');
+        "lorem's key value in foo conf is not ipsum when " +
+          fnGet + ' is called with argument foo');
       assert.deepEqual(obj[fnGet]('foo.amet'), '', "amet's value should be an empty string");
-      assert.equal(typeof(obj[fnGet]('foo.doesntexists')), 'undefined',
+      assert.deepEqual(typeof(obj[fnGet]('foo.doesntexists')), 'undefined',
         'value which should not exist returned something else then undefined');
 
 
@@ -64,7 +64,7 @@
           }
         );
       } else {
-        assert.equal(typeof(obj[fnGet]('foo.test_default')), 'undefined',
+        assert.deepEqual(typeof(obj[fnGet]('foo.test_default')), 'undefined',
           'value which should not exist returned something else then undefined'
         );
       }
@@ -84,27 +84,26 @@
                      'Interpolation without arguments is wrong');
     assert.deepEqual(obj.interpolate('foo').interpolate, 'sittercity',
                      'Interpolation with block as argument is wrong');
-    assert.deepEqual(obj.interpolate('foo.interpolate_block2'),
-                     'ipsumfooobar', 'Interpolation is wrong');
+    assert.deepEqual(obj.interpolate('foo.interpolate_block2'), 'ipsumfooobar',
+      'Interpolation is wrong');
     if (obj.inheritDefault) {
       assert.deepEqual(obj.interpolate('foo.interpolate_default'),
-                       'I come from the default section / interpolation',
-                       'Interpolation with inheritance from block "DEFAULT" is wrong');
+        'I come from the default section / interpolation',
+        'Interpolation with inheritance from block "DEFAULT" is wrong');
       assert.deepEqual(obj.interpolate().foo.interpolate_default,
-                       'I come from the default section / interpolation',
-                       'Interpolation without arguments and with inheritance from current block'
-                       + ' "DEFAULT" is wrong');
+        'I come from the default section / interpolation',
+        'Interpolation without arguments and with inheritance from current block' +
+        ' "DEFAULT" is wrong');
       assert.deepEqual(obj.interpolate('foo').interpolate_default,
-                       'I come from the default section / interpolation',
-                       'Interpolation with block as argument and with inheritance from current block'
-                       + ' "DEFAULT" is wrong');
+        'I come from the default section / interpolation',
+        'Interpolation with block as argument and with inheritance from current block' +
+        ' "DEFAULT" is wrong');
       assert.deepEqual(obj.interpolate('bar.interpolate_block_recursive'),
-                       'I come from bar / block interpolation / recursive',
-                       'Interpolation wiht inheritance from block "DEFAULT" and recursion is wrong');
+        'I come from bar / block interpolation / recursive',
+        'Interpolation wiht inheritance from block "DEFAULT" and recursion is wrong');
     }
     assert.deepEqual(obj.interpolate('foo.interpolate_block'),
-                     'I come from bar / block interpolation',
-                     'Interpolation from other block is wrong');
+      'I come from bar / block interpolation', 'Interpolation from other block is wrong');
 
     // --}
   };
@@ -163,14 +162,16 @@
     obj.param('a.bar', '2');
     obj.param('a.baz', '3');
     obj.param('lorem.ipsum', 'dolor');
+    obj.param('newobject', {a: 1, b: 2});
     obj.on('fileWritten', function () {
       sys.puts('saving file finished');
       obj.on('fileParse', function () {
-        assert.equal(typeof this.param('a'), 'object');
-        assert.equal(this.param('a.foo'), '1');
-        assert.equal(this.param('a.bar'), '2');
-        assert.equal(this.param('a.baz'), '3');
-        assert.equal(this.param('lorem.ipsum'), 'dolor');
+        assert.deepEqual(typeof this.param('a'), 'object');
+        assert.deepEqual(this.param('a.foo'), '1');
+        assert.deepEqual(this.param('a.bar'), '2');
+        assert.deepEqual(this.param('a.baz'), '3');
+        assert.deepEqual(this.param('lorem.ipsum'), 'dolor');
+        assert.deepEqual(this.param('newobject.a'), 1, 'setting new object failed');
         sys.puts('reading saved file finished');
         fs.unlink('boo.ini');
       });
