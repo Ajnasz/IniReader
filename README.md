@@ -35,6 +35,29 @@ Method to get or set a configuration value, or a section or the whole configurat
 * prop: (Optional), String, The name of the property or block. If the argument is empty, it will return the whole configuration object. To retreive a block, give the name of the block. `iniReaderInstance.param('blockname')`. To retreive a property value, give the name of the block and the property name concatenated witha a dot: `blockname.propertyname`.
 * value: (Optional), String,Number,Object, The value of the parameter. Pass an object to add several properties to a section
 
+### interpolate ###
+
+#### _Arguments_ ####
+* _prop_: (Optional), String, The name of the property or block.
+
+#### _Description_ ####
+Same as the method _param_ with the argument _prop_ but this method
+extends recursively all the patterns _%(xxx)_ by the value which would
+be returned by _param(xxx)_. The patterns can be _%(blockname.key)_ or _%(key)_,
+assuming that _key_ refers to the current block.
+
+For example, if the file _.ini_ is
+```
+ [sectionA]
+ a=foo
+ b=%(a)/bar
+ [sectionB]
+ c=%(sectionA.b)/baz
+```
+_interpolate_ called with the parameter _'sectionA.b'_ will return
+_foo/bar_ and, with the parameter _'sectionB.c'_, it will return
+_foo/bar/baz_.
+
 ## Basic usage ##
 
 ```javascript
