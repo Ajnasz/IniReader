@@ -130,18 +130,22 @@ IniReader.prototype.load = IniReader.prototype.init = function (file) {
     this.file = file;
   }
   if (!this.file) {
-    throw new Error('No file name given');
+    this.emit('error', new Error('No file name given'));
   }
-  if (this.async) {
-    getLines(this.file, function (lines) {
-      this.lines = lines;
+  try {
+    if (this.async) {
+      getLines(this.file, function (lines) {
+        this.lines = lines;
+        this.values = this.parseFile();
+        this.emit('fileParse');
+      }.bind(this), true);
+    } else {
+      this.lines = getLines(this.file);
       this.values = this.parseFile();
       this.emit('fileParse');
-    }.bind(this), true);
-  } else {
-    this.lines = getLines(this.file);
-    this.values = this.parseFile();
-    this.emit('fileParse');
+    }
+  } catch (e) {
+    this.emit('error', e);
   }
 };
 
@@ -213,7 +217,7 @@ IniReader.prototype.parseFile = function () {
     }
 
     // if we came this far, the syntax couldn't be validated
-    throw new Error("syntax error in line " + lineNumber);
+    this.emit('error', new Error("syntax error in line " + lineNumber));
 
   }
 
@@ -373,7 +377,7 @@ IniReader.prototype.write = function (file, le) {
   if (this.async) {
     fs.writeFile(file, output, function (err) {
       if (err) {
-        throw err;
+        this.emit('error', err);
       }
       this.emit('fileWritten', file);
     }.bind(this));
