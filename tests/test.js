@@ -4,7 +4,7 @@
   var assert, sys, fs, inireader, beginSection, test,
     commonTests, testCallbacks,
     testFileReadWrite, testFileRead, testFileReadAsync,
-    testAsync;
+    testAsync, testError;
 
 
   assert = require('assert');
@@ -228,7 +228,27 @@
     });
     cfg.load('./ize-mac.ini');
 
+  };
 
+  testError = function () {
+    var cfg = new inireader.IniReader(),
+        errorFound = 0,
+        syntaxErrFound = false,
+        noFileNameErr = false;
+    cfg.on('error', function (err) {
+      if (err.message.indexOf('Syntax error in line ') > -1) {
+        syntaxErrFound = true;
+      } else if (err.message.indexOf('No file name given' > - 1)) {
+        noFileNameErr = true;
+      }
+      errorFound += 1;
+    });
+    cfg.load('./ize-.ini');
+    cfg.load('./ize-err.ini');
+    cfg.load();
+    assert.deepEqual(errorFound, 3, 'Not all error found');
+    assert.ok(syntaxErrFound, 'Syntax error not found');
+    assert.ok(noFileNameErr, 'no file name error not found');
   };
 
   // run tests
@@ -237,4 +257,5 @@
   testCallbacks();
   testFileRead();
   testAsync();
+  testError();
 }());

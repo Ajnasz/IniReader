@@ -217,7 +217,7 @@ IniReader.prototype.parseFile = function () {
     }
 
     // if we came this far, the syntax couldn't be validated
-    this.emit('error', new Error("syntax error in line " + lineNumber));
+    this.emit('error', new Error("Syntax error in line " + lineNumber));
 
   }
 
