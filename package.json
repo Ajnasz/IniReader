@@ -8,7 +8,7 @@
     "url" : "git://github.com/Ajnasz/IniReader.git"
   },
   "bugs": {
-    "web": "https://github.com/Ajnasz/IniReader/issues"
+    "url": "https://github.com/Ajnasz/IniReader/issues"
   },
   "author": {
     "name": "Lajos Koszti",
