@@ -1,7 +1,7 @@
 /*jslint indent: 2*/
 /*globals require: true*/
 var assert = require('assert');
-var sys = require('sys');
+var util = require('util');
 var inireader = require('inireader');
 
 
@@ -26,7 +26,7 @@ assert.deepEqual(izeConf.getValue('bar', '2'), '  lorem ipsum');
 assert.deepEqual(izeConf.getValue('bar', '3'), 'lorem ipsum');
 assert.deepEqual(izeConf.getValue('bar', '4'), 'lorem ipsum  ');
 
-sys.puts('unix tests finished');
+util.puts('unix tests finished');
 
 
 var izeConf = new inireader.IniReader('./ize-dos.ini');
@@ -51,7 +51,7 @@ assert.deepEqual(izeConf.getValue('bar', '2'), '  lorem ipsum');
 assert.deepEqual(izeConf.getValue('bar', '3'), 'lorem ipsum');
 assert.deepEqual(izeConf.getValue('bar', '4'), 'lorem ipsum  ');
 
-sys.puts('dos tests finished');
+util.puts('dos tests finished');
 
 
 
@@ -78,11 +78,11 @@ assert.deepEqual(izeConf.getValue('bar', '2'), '  lorem ipsum');
 assert.deepEqual(izeConf.getValue('bar', '3'), 'lorem ipsum');
 assert.deepEqual(izeConf.getValue('bar', '4'), 'lorem ipsum  ');
 
-sys.puts('mac tests finished');
+util.puts('mac tests finished');
 
 
 
-sys.puts('start callback test');
+util.puts('start callback test');
 
 
 
@@ -108,7 +108,7 @@ izeConf.on('fileParse', function () {
   assert.deepEqual(this.getValue('bar', '3'), 'lorem ipsum');
   assert.deepEqual(this.getValue('bar', '4'), 'lorem ipsum  ');
 
-  sys.puts('unix tests finished');
+  util.puts('unix tests finished');
 });
 izeConf.init();
 
@@ -137,7 +137,7 @@ izeConf.on('fileParse', function () {
   assert.deepEqual(this.getValue('bar', '3'), 'lorem ipsum');
   assert.deepEqual(this.getValue('bar', '4'), 'lorem ipsum  ');
 
-  sys.puts('dos tests finished');
+  util.puts('dos tests finished');
 
 });
 izeConf.init();
@@ -167,6 +167,6 @@ izeConf.on('fileParse', function () {
   assert.deepEqual(this.getValue('bar', '3'), 'lorem ipsum');
   assert.deepEqual(this.getValue('bar', '4'), 'lorem ipsum  ');
 
-  sys.puts('mac tests finished');
+  util.puts('mac tests finished');
 });
 izeConf.init();
