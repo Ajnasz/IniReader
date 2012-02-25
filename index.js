@@ -1,13 +1,12 @@
 /*jslint indent: 2*/
-/*globals require: true, exports: true*/
 // regular expressions to clear, validate and get the values
 var skipLineRex = /^\s*(\n|\#|;)/,
-  chompRex = /(?:\n|\r)$/,
-  nonWhitespaceRex = /\S/,
-  keyValueRex = /^\s*([^=]*\w)\s*=\s*(.*)\s*$/,
-  groupRex = /^\s*\[\s*([^\]]+)\s*\]$/,
-  interPolationRexG = /%\(.*?\)/g,
-  interPolationRex = /%\((.*?)\)/;
+    chompRex = /(?:\n|\r)$/,
+    nonWhitespaceRex = /\S/,
+    keyValueRex = /^\s*([^=]*\w)\s*=\s*(.*)\s*$/,
+    groupRex = /^\s*\[\s*([^\]]+)\s*\]$/,
+    interPolationRexG = /%\(.*?\)/g,
+    interPolationRex = /%\((.*?)\)/;
 
 var getLines = function (file, cb, async) {
   var fs = require('fs'), splitLines, data;
@@ -23,12 +22,12 @@ var getLines = function (file, cb, async) {
     } else { // mostly it's only one line
       lines = [data];
     }
-    return lines.filter(function (line) {
+    return lines.filter(function emptyLineFilter(line) {
       return line !== '';
     });
   };
   if (async) {
-    fs.readFile(file, function (err, data) {
+    fs.readFile(file, function fileReadCb(err, data) {
       if (err) {
         throw err;
       }
@@ -69,7 +68,7 @@ var inheritDefault = function (block, _default) {
   _default = typeof _default === 'object' ? _default : {};
 
   if (typeof block === 'object') {
-    Object.keys(_default).forEach(function (_key) {
+    Object.keys(_default).forEach(function inheritKey(_key) {
       if (!(_key in block)) {
         block[_key] = _default[_key];
       }
@@ -101,7 +100,7 @@ var deepCopy = function (o, c) {
  * @class IniReader
  * @constructor
  */
-var IniReader = function (cfg) {
+var IniReader = function IniReader(cfg) {
   // backward compatibility
   // in first versions the first argument was the file name and the second was
   // the async flag
@@ -125,7 +124,7 @@ require('util').inherits(IniReader, require('events').EventEmitter);
  * @param String file
  * Loads a ini file
  **/
-IniReader.prototype.load = IniReader.prototype.init = function (file) {
+IniReader.prototype.load = IniReader.prototype.init = function load(file) {
   if (typeof file === 'string') {
     this.file = file;
   }
@@ -134,7 +133,7 @@ IniReader.prototype.load = IniReader.prototype.init = function (file) {
   }
   try {
     if (this.async) {
-      getLines(this.file, function (lines) {
+      getLines(this.file, function parseLines(lines) {
         this.lines = lines;
         this.values = this.parseFile();
         this.emit('fileParse');
@@ -155,7 +154,7 @@ IniReader.prototype.load = IniReader.prototype.init = function (file) {
   * @type {String|False}
   * @returns the group name if found or false
   */
-IniReader.prototype.parseSectionHead = function (line) {
+IniReader.prototype.parseSectionHead = function parseSectionHead(line) {
   var groupMatch = line.match(groupRex);
   return groupMatch ? groupMatch[1] : false;
 };
@@ -166,9 +165,9 @@ IniReader.prototype.parseSectionHead = function (line) {
   * @type {Object|False}
   * @returns the key value pair in an object ({key: 'key', value;'value'}) if found or false
   */
-IniReader.prototype.keyValueMatch = function (line) {
-  var keyValMatch = line.match(keyValueRex);
-  return keyValMatch ? {key: keyValMatch[1], value: keyValMatch[2]} : false;
+IniReader.prototype.keyValueMatch = function keyValMatch(line) {
+  var kvMatch = line.match(keyValueRex);
+  return kvMatch ? {key: kvMatch[1], value: kvMatch[2]} : false;
 };
 
 /**
@@ -177,7 +176,7 @@ IniReader.prototype.keyValueMatch = function (line) {
   * @returns the conf tree
   * @type Object
   */
-IniReader.prototype.parseFile = function () {
+IniReader.prototype.parseFile = function parseFile() {
 
   var output, lines, groupName, keyVal, line, currentSection, lineNumber;
 
@@ -229,7 +228,7 @@ IniReader.prototype.parseFile = function () {
   * @type Object
   * @deprecated
   */
-IniReader.prototype.getBlock = function (block) {
+IniReader.prototype.getBlock = function getBlock(block) {
   return this.param(block);
 };
 /**
@@ -239,7 +238,7 @@ IniReader.prototype.getBlock = function (block) {
   * @param String key The name of the key which value should be returned
   * @deprecated
   */
-IniReader.prototype.getValue = function (block, key) {
+IniReader.prototype.getValue = function getValue(block, key) {
   var param = block;
   if (typeof key !== 'undefined') {
     param += '.' + key;
@@ -247,7 +246,7 @@ IniReader.prototype.getValue = function (block, key) {
   return this.getParam(param);
 };
 
-IniReader.prototype.setDefaultValue = function (currentValue, block, key) {
+IniReader.prototype.setDefaultValue = function setDefaultValue(currentValue, block, key) {
   var defaultValues = this.values.DEFAULT,
       output = currentValue, _block;
   if (typeof defaultValues !== 'undefined') {
@@ -273,7 +272,7 @@ IniReader.prototype.setDefaultValue = function (currentValue, block, key) {
   * @returns the value of the key
   * @param String param The name of the block where the key should be defined
   */
-IniReader.prototype.getParam = function (param) {
+IniReader.prototype.getParam = function getParam(param) {
   var output = this.values,
   block, key;
 
@@ -300,7 +299,7 @@ IniReader.prototype.getParam = function (param) {
 /**
  * @method setParam
  */
-IniReader.prototype.setParam = function (prop, value) {
+IniReader.prototype.setParam = function setParam(prop, value) {
   if (typeof this.values !== 'object') {
     this.values = {};
   }
@@ -308,7 +307,7 @@ IniReader.prototype.setParam = function (prop, value) {
     propKeysLen = propKeys.length,
     ref = this.values;
   if (propKeysLen > 0) {
-    propKeys.forEach(function (key, index) {
+    propKeys.forEach(function propKeyParser(key, index) {
       if (!ref[key]) {
         ref[key] = {};
       }
@@ -323,7 +322,7 @@ IniReader.prototype.setParam = function (prop, value) {
 /**
  * @method param
  * **/
-IniReader.prototype.param = function (prop, value) {
+IniReader.prototype.param = function param(prop, value) {
   if (typeof value === 'undefined') {
     return this.getParam(prop);
   } else {
@@ -331,21 +330,23 @@ IniReader.prototype.param = function (prop, value) {
   }
 };
 
-IniReader.prototype.getLe = function (le) {
+IniReader.prototype.getLe = function getLe(le) {
   return typeof le === 'string' && (le === '\n' || le === '\r\n' || le === '\r') ? le : '\n';
 };
 
-IniReader.prototype.serialize = function (le) {
+IniReader.prototype.serialize = function serialize(le) {
   var output = '',
-    group, ws = /\s+/;
+    group, ws = /\s+/,
+    values = this.values;
 
   le = this.getLe(le);
 
-  Object.keys(this.values).forEach(function (group) {
+  Object.keys(values).forEach(function serializeGroup(group) {
     output += le + '[' + group + ']' + le;
+    var groupValues = values[group];
 
-    Object.keys(this.values[group]).forEach(function (key) {
-      var value = this.values[group][key];
+    Object.keys(groupValues).forEach(function serializeKey(key) {
+      var value = groupValues[key];
       if (ws.test(value)) {
         if (value.indexOf('"') > -1) {
           value = "'" + value + "'";
@@ -356,17 +357,24 @@ IniReader.prototype.serialize = function (le) {
       output += key + '=' + value + le;
     }, this);
   }, this);
+
   return output;
+
 };
 
+/**
+ * Write ini file to the disk
+ */
 IniReader.prototype.write = function (file, le) {
   if (!file) {
     file = this.file;
   }
 
+  // get last line
   le = this.getLe(le);
 
   var now = new Date(),
+    // create a headline
     output = '; IniReader' + le + '; ' + now.getFullYear() + '-' +
       (now.getMonth() + 1) + '-' + now.getDate() + le,
     fs = require('fs'),
@@ -375,7 +383,7 @@ IniReader.prototype.write = function (file, le) {
   output += this.serialize(le);
 
   if (this.async) {
-    fs.writeFile(file, output, function (err) {
+    fs.writeFile(file, output, function writeFile(err) {
       if (err) {
         this.emit('error', err);
       }
