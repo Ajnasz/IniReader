@@ -1,2 +1,6 @@
-all:
-	cd tests; $(MAKE)
+all: test
+
+doc:
+	yuidoc .
+test:
+	@(cd tests && $(MAKE))
