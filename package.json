@@ -15,5 +15,8 @@
     "email": "ajnasz@ajnasz.hu",
     "url": "http://ajnasz.hu"
   },
+  "scripts": {
+      "test": "make"
+  },
   "version": "0.3.0"
 }

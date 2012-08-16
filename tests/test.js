@@ -10,7 +10,7 @@
   assert = require('assert');
   util = require('util');
   fs = require('fs');
-  inireader = require('inireader');
+  inireader = require('../index');
 
   beginSection = function (s, config) {
     var str = (config ? (' with config ' + require('util').inspect(config)) : '');
