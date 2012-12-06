@@ -231,22 +231,27 @@
   };
 
   testError = function () {
-    var cfg = new inireader.IniReader(),
-        errorFound = 0,
-        syntaxErrFound = false,
-        noFileNameErr = false;
+    var cfg, errorFound, syntaxErrFound, noFileNameErr;
+
+    cfg = new inireader.IniReader();
+    errorFound = 0;
+    syntaxErrFound = false;
+    noFileNameErr = false;
+
     cfg.on('error', function (err) {
       if (err.message.indexOf('Syntax error in line ') > -1) {
         syntaxErrFound = true;
-      } else if (err.message.indexOf('No file name given' > - 1)) {
+      } else if (err.message.indexOf('No file name given') > -1) {
         noFileNameErr = true;
       }
       errorFound += 1;
     });
     cfg.load('./ize-.ini');
+    cfg.file = null;
     cfg.load('./ize-err.ini');
+    cfg.file = null;
     cfg.load();
-    assert.deepEqual(errorFound, 3, 'Not all error found');
+    assert.deepEqual(errorFound, 3, 'Not all error found: ' + errorFound);
     assert.ok(syntaxErrFound, 'Syntax error not found');
     assert.ok(noFileNameErr, 'no file name error not found');
   };
