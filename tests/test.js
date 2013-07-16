@@ -4,7 +4,7 @@
   var assert, util, fs, inireader, beginSection, test,
     commonTests, testCallbacks,
     testFileReadWrite, testFileRead, testFileReadAsync,
-    testAsync, testError;
+    testAsync, testError, testAsyncError;
 
 
   assert = require('assert');
@@ -19,11 +19,11 @@
 
   test = function (obj) {
     ['param', 'interpolate'].forEach(function (fnGet) {
-      assert.deepEqual(typeof(obj[fnGet]()), 'object', "empty key doesn't returned object");
-      assert.deepEqual(typeof(obj[fnGet]('doesntexists')), 'undefined',
+      assert.deepEqual(typeof obj[fnGet](), 'object', "empty key doesn't returned object");
+      assert.deepEqual(typeof obj[fnGet]('doesntexists'), 'undefined',
                     "nonexisting key doesn't returned undefined");
-      assert.deepEqual(typeof(obj[fnGet]('foo')), 'object', "key doesn't returned an object");
-      assert.deepEqual(typeof(obj[fnGet]('bar')), 'object', "key doesn't returned an object");
+      assert.deepEqual(typeof obj[fnGet]('foo'), 'object', "key doesn't returned an object");
+      assert.deepEqual(typeof obj[fnGet]('bar'), 'object', "key doesn't returned an object");
 
       assert.deepEqual(obj[fnGet]('foo.lorem'), 'ipsum',
         "lorem's key value in foo conf is not ipsum");
@@ -34,37 +34,50 @@
         "lorem's key value in foo conf is not ipsum when " +
           fnGet + ' is called with argument foo');
       assert.deepEqual(obj[fnGet]('foo.amet'), '', "amet's value should be an empty string");
-      assert.deepEqual(typeof(obj[fnGet]('foo.doesntexists')), 'undefined',
+      assert.deepEqual(typeof obj[fnGet]('foo.doesntexists'), 'undefined',
         'value which should not exist returned something else then undefined');
 
 
       // Test of section "DEFAULT" {--
-      assert.deepEqual(obj[fnGet]('DEFAULT.test_default'), 'I come from the default section',
+      assert.deepEqual(
+        obj[fnGet]('DEFAULT.test_default'),
+        'I come from the default section',
         "test_default's key value in DEFAULT is wrong"
       );
 
       if (obj.inheritDefault) {
-        assert.deepEqual(obj[fnGet]('foo.test_default'), 'I come from the default section',
+        assert.deepEqual(
+          obj[fnGet]('foo.test_default'),
+          'I come from the default section',
           "test_default's key value in foo is not inherited from DEFAULT section"
         );
-        assert.deepEqual(obj[fnGet]().foo.test_default, 'I come from the default section',
+        assert.deepEqual(
+          obj[fnGet]().foo.test_default,
+          'I come from the default section',
           "test_default's key value in foo is not inherited from DEFAULT section"
         );
         [obj[fnGet]().foo.test_default, obj[fnGet]('foo.test_default')].forEach(
-          function (_) {
-            assert.deepEqual(_, 'I come from the default section',
+          function (item) {
+            assert.deepEqual(
+              item,
+              'I come from the default section',
               "test_default's key value in foo is not inherited from DEFAULT section"
             );
           }
         );
         [obj[fnGet]().bar.test_default, obj[fnGet]('bar.test_default')].forEach(
-          function (_) {
-            assert.deepEqual(_, 'I come from bar',
-              "test_default's key value in bar is not overwrited");
+          function (item) {
+            assert.deepEqual(
+              item,
+              'I come from bar',
+              "test_default's key value in bar is not overwrited"
+            );
           }
         );
       } else {
-        assert.deepEqual(typeof(obj[fnGet]('foo.test_default')), 'undefined',
+        assert.deepEqual(
+          typeof obj[fnGet]('foo.test_default'),
+          'undefined',
           'value which should not exist returned something else then undefined'
         );
       }
@@ -196,13 +209,15 @@
   testAsync = function () {
     beginSection('test async');
 
-    var a = 0,
-      cb = function () {
+    var a, cb, cfg;
+
+    a = 0;
+    cb = function () {
       a += 1;
       if (a === 3) {
         testFileReadAsync();
       }
-    }, cfg;
+    };
 
     cfg = new inireader.IniReader({async: true});
     cfg.on('fileParse', function () {
@@ -231,18 +246,21 @@
   };
 
   testError = function () {
-    var cfg, errorFound, syntaxErrFound, noFileNameErr;
+    var cfg, errorFound, syntaxErrFound, noFileNameErr, noSuchFile;
 
     cfg = new inireader.IniReader();
     errorFound = 0;
     syntaxErrFound = false;
     noFileNameErr = false;
+    noSuchFile = false;
 
     cfg.on('error', function (err) {
       if (err.message.indexOf('Syntax error in line ') > -1) {
         syntaxErrFound = true;
       } else if (err.message.indexOf('No file name given') > -1) {
         noFileNameErr = true;
+      } else if (err.message.indexOf('ENOENT') > -1) {
+        noSuchFile = true;
       }
       errorFound += 1;
     });
@@ -254,6 +272,49 @@
     assert.deepEqual(errorFound, 3, 'Not all error found: ' + errorFound);
     assert.ok(syntaxErrFound, 'Syntax error not found');
     assert.ok(noFileNameErr, 'no file name error not found');
+    assert.ok(noSuchFile, 'not existing file error not thrown');
+  };
+
+  testAsyncError = function () {
+    var cfg, errorFound, syntaxErrFound, noFileNameErr, noSuchFile, testTimeout;
+
+    cfg = new inireader.IniReader({async: true});
+    errorFound = 0;
+    syntaxErrFound = false;
+    noFileNameErr = false;
+    noSuchFile = false;
+
+    function finish() {
+      clearTimeout(testTimeout);
+      assert.deepEqual(errorFound, 3, 'Not all error found: ' + errorFound);
+      assert.ok(syntaxErrFound, 'Syntax error not found');
+      assert.ok(noFileNameErr, 'no file name error not found');
+      assert.ok(noSuchFile, 'not existing file error not thrown');
+    }
+
+    cfg.on('error', function (err) {
+      if (err.message.indexOf('Syntax error in line ') > -1) {
+        syntaxErrFound = true;
+      } else if (err.message.indexOf('No file name given') > -1) {
+        noFileNameErr = true;
+      } else if (err.message.indexOf('ENOENT') > -1) {
+        noSuchFile = true;
+      }
+
+      errorFound += 1;
+
+      if (errorFound === 3) {
+        finish();
+      }
+    });
+
+    cfg.load('./ize-.ini');
+    cfg.file = null;
+    cfg.load('./ize-err.ini');
+    cfg.file = null;
+    cfg.load();
+
+    testTimeout = setTimeout(finish, 100);
   };
 
   // run tests
@@ -263,4 +324,5 @@
   testFileRead();
   testAsync();
   testError();
+  testAsyncError();
 }());
