@@ -32,7 +32,7 @@ Writes out the configuration into a file
 Method to get or set a configuration value, or a section or the whole configuration as an object
 
 #### Arguments: ####
-* prop: (Optional), String, The name of the property or block. If the argument is empty, it will return the whole configuration object. To retreive a block, give the name of the block. `iniReaderInstance.param('blockname')`. To retreive a property value, give the name of the block and the property name concatenated witha a dot: `blockname.propertyname`.
+* prop: (Optional), String, Array, The name of the property or block. If the argument is empty, it will return the whole configuration object. To retreive a block, give the name of the block. `iniReaderInstance.param('blockname')`. To retreive a property value, give the name of the block and the property name concatenated with a dot `blockname.propertyname` or as array `["blockname", "propertyname"]`
 * value: (Optional), String,Number,Object, The value of the parameter. Pass an object to add several properties to a section
 
 ### interpolate ###
@@ -74,7 +74,8 @@ parser.param('blockname');
 parser.param('blockname.key');
 // add or update (if exists) config
 // if the block doesn't exists it will be created;
-parser.param('blockname.key', 'foobar');
+parser.param('blockname.key', 'foo');
+parser.param(['blockname', 'otherKey'], 'bar');
 // update the config
 parser.write();
 // create a new config
