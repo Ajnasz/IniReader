@@ -15,8 +15,11 @@
     "email": "ajnasz@ajnasz.hu",
     "url": "http://ajnasz.hu"
   },
+ "contributors": [
+    "Daniel Phatthanan <daniel@phatthanan.com>"
+  ],
   "scripts": {
       "test": "make"
   },
-  "version": "0.3.2"
+  "version": "0.3.3"
 }
