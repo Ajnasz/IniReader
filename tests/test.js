@@ -4,7 +4,7 @@
   var assert, util, fs, inireader, beginSection, test,
     commonTests, testCallbacks,
     testFileReadWrite, testFileRead, testFileReadAsync,
-    testAsync, testError, testAsyncError;
+    testAsync, testError, testAsyncError, testWriteError;
 
 
   assert = require('assert');
@@ -253,7 +253,6 @@
     syntaxErrFound = false;
     noFileNameErr = false;
     noSuchFile = false;
-
     cfg.on('error', function (err) {
       if (err.message.indexOf('Syntax error in line ') > -1) {
         syntaxErrFound = true;
@@ -317,6 +316,33 @@
     testTimeout = setTimeout(finish, 100);
   };
 
+  testWriteError = function () {
+        var cfg = new inireader.IniReader({async: true});
+        var testTimeout;
+        var writeError = false, fileWritten = false;
+
+        function finish() {
+            clearTimeout(testTimeout);
+            assert.ok(writeError, 'Write error not emitted');
+            assert.ok(!fileWritten, 'fileWritten emitted');
+        }
+
+        cfg.load('./ize-nowrite.ini');
+
+        cfg.on('fileWritten', function () {
+            fileWritten = true;
+        });
+        cfg.on('error', function () {
+            writeError = true;
+        });
+
+        setTimeout(function () {
+            cfg.write();
+        }, 50);
+
+        testTimeout = setTimeout(finish, 100);
+  };
+
   // run tests
   commonTests();
   commonTests({inheritDefault: true});
@@ -325,4 +351,5 @@
   testAsync();
   testError();
   testAsyncError();
+  testWriteError();
 }());
