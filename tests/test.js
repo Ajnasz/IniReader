@@ -13,8 +13,8 @@
   inireader = require('../index');
 
   beginSection = function (s, config) {
-    var str = (config ? (' with config ' + require('util').inspect(config)) : '');
-    util.puts('-------------- ' + str + s.toUpperCase() + ' --------------');
+    var str = (config ? (' with config ' + util.inspect(config)) : '');
+    console.log('-------------- ' + str + s.toUpperCase() + ' --------------');
   };
 
   test = function (obj) {
@@ -128,17 +128,17 @@
     var cfg = new inireader.IniReader(config);
     cfg.load('./ize-unix.ini');
     test(cfg);
-    util.puts('unix tests finished');
+    console.log('unix tests finished');
 
     cfg = new inireader.IniReader(config);
     cfg.load('./ize-dos.ini');
     test(cfg);
-    util.puts('dos tests finished');
+    console.log('dos tests finished');
 
     cfg = new inireader.IniReader(config);
     cfg.load('./ize-mac.ini');
     test(cfg);
-    util.puts('mac tests finished');
+    console.log('mac tests finished');
   };
 
   testCallbacks = function (config) {
@@ -147,7 +147,7 @@
     var cfg = new inireader.IniReader();
     cfg.on('fileParse', function () {
       test(this);
-      util.puts('unix tests finished');
+      console.log('unix tests finished');
     });
     cfg.load('./ize-unix.ini');
 
@@ -155,7 +155,7 @@
     cfg = new inireader.IniReader();
     cfg.on('fileParse', function () {
       test(this);
-      util.puts('dos tests finished');
+      console.log('dos tests finished');
 
     });
     cfg.load('./ize-dos.ini');
@@ -163,7 +163,7 @@
     cfg = new inireader.IniReader();
     cfg.on('fileParse', function () {
       test(this);
-      util.puts('mac tests finished');
+      console.log('mac tests finished');
     });
     cfg.load('./ize-mac.ini');
 
@@ -177,7 +177,7 @@
     obj.param('lorem.ipsum', 'dolor');
     obj.param('newobject', {a: 1, b: 2});
     obj.on('fileWritten', function () {
-      util.puts('saving file finished');
+      console.log('saving file finished');
       obj.on('fileParse', function () {
         assert.deepEqual(typeof this.param('a'), 'object');
         assert.deepEqual(this.param('a.foo'), '1');
@@ -185,7 +185,7 @@
         assert.deepEqual(this.param('a.baz'), '3');
         assert.deepEqual(this.param('lorem.ipsum'), 'dolor');
         assert.deepEqual(this.param('newobject.a'), 1, 'setting new object failed');
-        util.puts('reading saved file finished');
+        console.log('reading saved file finished');
         fs.unlink('boo.ini');
       });
       obj.load('boo.ini');
@@ -222,7 +222,7 @@
     cfg = new inireader.IniReader({async: true});
     cfg.on('fileParse', function () {
       test(this);
-      util.puts('unix tests finished');
+      console.log('unix tests finished');
       cb();
     });
     cfg.load('./ize-unix.ini');
@@ -230,7 +230,7 @@
     cfg = new inireader.IniReader({async: true});
     cfg.on('fileParse', function () {
       test(this);
-      util.puts('dos tests finished');
+      console.log('dos tests finished');
       cb();
     });
     cfg.load('./ize-dos.ini');
@@ -238,7 +238,7 @@
     cfg = new inireader.IniReader({async: true});
     cfg.on('fileParse', function () {
       test(this);
-      util.puts('mac tests finished');
+      console.log('mac tests finished');
       cb();
     });
     cfg.load('./ize-mac.ini');
