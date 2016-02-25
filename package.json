@@ -21,5 +21,6 @@
   "scripts": {
       "test": "make"
   },
+  "license": "GPL-2.0",
   "version": "0.3.3"
 }
