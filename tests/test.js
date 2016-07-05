@@ -34,6 +34,7 @@
         "lorem's key value in foo conf is not ipsum when " +
           fnGet + ' is called with argument foo');
       assert.deepEqual(obj[fnGet]('foo.amet'), '', "amet's value should be an empty string");
+	  assert.deepEqual(obj[fnGet]('foo')['qux[0]'], 'quux');
       assert.deepEqual(typeof obj[fnGet]('foo.doesntexists'), 'undefined',
         'value which should not exist returned something else then undefined');
 
@@ -125,16 +126,19 @@
   commonTests = function (config) {
     beginSection('common test', config);
 
+    console.log('unix tests started');
     var cfg = new inireader.IniReader(config);
     cfg.load('./ize-unix.ini');
     test(cfg);
     console.log('unix tests finished');
 
+    console.log('dos tests started');
     cfg = new inireader.IniReader(config);
     cfg.load('./ize-dos.ini');
     test(cfg);
     console.log('dos tests finished');
 
+    console.log('mac tests started');
     cfg = new inireader.IniReader(config);
     cfg.load('./ize-mac.ini');
     test(cfg);
