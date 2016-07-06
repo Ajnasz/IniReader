@@ -6,4 +6,9 @@ test: oldtest
 oldtest:
 	@echo '========== OLD TESTS =========='
 	node ./test-old.js
+
+testconv:
+	unix2mac -n ize-unix.ini ize-mac.ini
+	unix2dos -n ize-unix.ini ize-dos.ini
+
 .PHONY: oldtest test
