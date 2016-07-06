@@ -36,6 +36,40 @@ Method to get or set a configuration value, or a section or the whole configurat
 * prop: (Optional), String, Array, The name of the property or block. If the argument is empty, it will return the whole configuration object. To retreive a block, give the name of the block. `iniReaderInstance.param('blockname')`. To retreive a property value, give the name of the block and the property name concatenated with a dot `blockname.propertyname` or as array `["blockname", "propertyname"]`
 * value: (Optional), String,Number,Object, The value of the parameter. Pass an object to add several properties to a section
 
+When the `prop` name contains period, it will try to find the best matching block and key by the following rules:
+Always the most specific block name will win:
+
+file:
+
+```
+[foo.bar.baz]
+qux=quux in block
+
+[foo]
+bar.baz.qux=quux in key
+```
+
+`iniReaderInstance.param('foo.bar.baz');` will return `quux in block`.
+
+For manual access use the  `iniReaderInstance.values` property: `iniReaderInstance.values['foo']['bar.baz.qux']`;
+
+When you set a value and the block name contains period, it will create the most specific block and the least specific key:
+
+`iniReaderInstance.param('foo.bar.baz.qux', 'quux')` will create the following structure:
+
+```
+[foo.bar.baz]
+qux=quux
+```
+
+You can override this behaviour by setting the property manually:
+
+```
+iniReaderInstance.values['foo'] = {
+	'bar.baz.qux': 'quux'
+};
+```
+
 ### interpolate ###
 
 #### _Arguments_ ####
