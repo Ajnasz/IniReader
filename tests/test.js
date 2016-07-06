@@ -19,6 +19,8 @@
 
   test = function (obj) {
     ['param', 'interpolate'].forEach(function (fnGet) {
+
+
       assert.deepEqual(typeof obj[fnGet](), 'object', "empty key doesn't returned object");
       assert.deepEqual(typeof obj[fnGet]('doesntexists'), 'undefined',
                     "nonexisting key doesn't returned undefined");
@@ -34,8 +36,13 @@
         "lorem's key value in foo conf is not ipsum when " +
           fnGet + ' is called with argument foo');
       assert.deepEqual(obj[fnGet]('foo.amet'), '', "amet's value should be an empty string");
-	  assert.deepEqual(obj[fnGet]('foo')['qux[0]'], 'quux');
-	  assert.deepEqual(obj[fnGet]('foo')['key with space'], 'Value');
+      assert.deepEqual(obj[fnGet]('foo')['qux[0]'], 'quux');
+      assert.deepEqual(obj[fnGet]('foo')['key with space'], 'Value');
+      assert.deepEqual(typeof obj[fnGet]('block.and.period'), 'object', 'block name with period (no key) not found');
+      assert.deepEqual(typeof obj[fnGet]('block.and.period.keyname'), 'string', 'block name with period plus key not found');
+      assert.deepEqual(obj[fnGet]('theblock.key.period.name'), 'supervalue');
+      assert.deepEqual(obj[fnGet]('another.block.with.period.and.a.key.with.period'), 'has a great value');
+      assert.deepEqual(obj[fnGet]('block.to.conflict'), 'section names');
       assert.deepEqual(typeof obj[fnGet]('foo.doesntexists'), 'undefined',
         'value which should not exist returned something else then undefined');
 
@@ -358,3 +365,5 @@
   testAsyncError();
   testWriteError();
 }());
+
+// vim: set expandtab:sw=2:ts=2:
