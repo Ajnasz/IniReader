@@ -4,7 +4,7 @@
   var assert, util, fs, inireader, beginSection, test,
     commonTests, testCallbacks,
     testFileReadWrite, testFileRead, testFileReadAsync,
-    testAsync, testError, testAsyncError, testWriteError;
+    testAsync, testError, testAsyncError, testWriteError, testMultiValue;
 
 
   assert = require('assert');
@@ -343,6 +343,30 @@
         testTimeout = setTimeout(finish, 100);
   };
 
+
+  testMultiValue = function () {
+        var cfg = new inireader.IniReader({multiValue: true});
+
+		cfg.load('./ize-unix.ini');
+
+		console.log(cfg.param('baz.key'));
+
+
+		assert.equal(Object.prototype.toString.call(cfg.param('baz.key')), '[object Array]');
+		assert.equal(cfg.param('baz.key').length, 3);
+		assert.equal(cfg.param('baz.key')[0], 'value1');
+		assert.equal(cfg.param('baz.key')[1], 'value2');
+		assert.equal(cfg.param('baz.key')[2], 'value3');
+
+		cfg.write('./ize-unix-written.ini');
+		cfg.load('./ize-unix-written.ini');
+		assert.equal(cfg.param('baz.key')[0], 'value1');
+		assert.equal(cfg.param('baz.key')[1], 'value2');
+		assert.equal(cfg.param('baz.key')[2], 'value3');
+		fs.unlink('./ize-unix-written.ini');
+  };
+
+
   // run tests
   commonTests();
   commonTests({inheritDefault: true});
@@ -352,4 +376,5 @@
   testError();
   testAsyncError();
   testWriteError();
+  testMultiValue();
 }());
