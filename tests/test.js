@@ -35,6 +35,7 @@
           fnGet + ' is called with argument foo');
       assert.deepEqual(obj[fnGet]('foo.amet'), '', "amet's value should be an empty string");
 	  assert.deepEqual(obj[fnGet]('foo')['qux[0]'], 'quux');
+	  assert.deepEqual(obj[fnGet]('foo')['key with space'], 'Value');
       assert.deepEqual(typeof obj[fnGet]('foo.doesntexists'), 'undefined',
         'value which should not exist returned something else then undefined');
 
