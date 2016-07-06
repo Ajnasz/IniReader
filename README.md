@@ -5,9 +5,10 @@ IniReader is a small module for nodejs. You can parse .ini configuration files w
 
 The constructor accepts configuration parameters as an object:
 
-* async: (Optional), Boolean, default: true, Set to true if you wan't to use asynchron calls to read and/or write configuration files
+* async: (Optional), Boolean, default: false, Set to true if you wan't to use asynchron calls to read and/or write configuration files
 * file: (Optional), String, default: empty, You can set the configuration file name here
 * inheritDefault: (Optional), String, default: false, If this option is true and your configuration has a section with a name `DEFAULT` the other sections will inherit it's values if they are not defined.
+* multiValue: (Optional), Boolean, default: false, If true, keys which occures more then once will be collected into array. If false, overwrites them
 
 
 ## Methods ##
