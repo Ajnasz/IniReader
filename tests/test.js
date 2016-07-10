@@ -93,9 +93,11 @@
 
       assert.deepEqual(obj[fnGet]('bar.asdfas'), 'fooobar', 'bad value');
       assert.deepEqual(obj[fnGet]('bar.1'), 'lorem ipsum');
-      assert.deepEqual(obj[fnGet]('bar.2'), '  lorem ipsum');
+      assert.deepEqual(obj[fnGet]('bar.2'), '  lorem ipsum space in begin');
       assert.deepEqual(obj[fnGet]('bar.3'), 'lorem ipsum');
-      assert.deepEqual(obj[fnGet]('bar.4'), 'lorem ipsum  ');
+      assert.deepEqual(obj[fnGet]('bar.4'), 'lorem ipsum space in end  ');
+      assert.deepEqual(obj[fnGet]('bar.escape_doublequote'), '   foo\'s bar"baz   ');
+      assert.deepEqual(obj[fnGet]('bar.escape_singlequote'), '   foo\'s bar"baz   ');
     });
 
     // Test the interpolations {--
@@ -189,6 +191,9 @@
     obj.param('newobject', {a: 1, b: 2});
     obj.param('new.object.block.key', 'abcd');
     obj.param(['block.name.with.period', 'key.with.period'], 'and its great value');
+    obj.param('whitespace.just_whitspace', '  asdf');
+    obj.param('whitespace.double_quote', '  "asdf');
+    obj.param('whitespace.double_and_single_quote', '  "asdf\'s foo');
 
     obj.on('fileWritten', function () {
       console.log('saving file finished');
@@ -204,6 +209,9 @@
                          'could not find key and block name with period');
         assert.deepEqual(this.param('block.name.with.period')['key.with.period'], 'and its great value',
                          'setting new block with period and key with period failed');
+
+        assert.deepEqual(this.param('whitespace.just_whitspace'), '  asdf');
+        assert.deepEqual(this.param('whitespace.double_and_single_quote'), '  "asdf\'s foo');
         console.log('reading saved file finished');
         fs.unlink('boo.ini');
       });
@@ -368,10 +376,6 @@
 
 		cfg.load('./ize-unix.ini');
 
-		console.log(cfg.param('baz.key'));
-
-
-		assert.equal(Object.prototype.toString.call(cfg.param('baz.key')), '[object Array]');
 		assert.equal(cfg.param('baz.key').length, 3);
 		assert.equal(cfg.param('baz.key')[0], 'value1');
 		assert.equal(cfg.param('baz.key')[1], 'value2');

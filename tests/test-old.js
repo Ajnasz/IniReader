@@ -21,9 +21,9 @@ assert.equal(typeof(izeConf.getValue('foo', 'doesntexists')),
 
 assert.deepEqual(izeConf.getValue('bar', 'asdfas'), 'fooobar', 'bad value');
 assert.deepEqual(izeConf.getValue('bar', '1'), 'lorem ipsum');
-assert.deepEqual(izeConf.getValue('bar', '2'), '  lorem ipsum');
+assert.deepEqual(izeConf.getValue('bar', '2'), '  lorem ipsum space in begin');
 assert.deepEqual(izeConf.getValue('bar', '3'), 'lorem ipsum');
-assert.deepEqual(izeConf.getValue('bar', '4'), 'lorem ipsum  ');
+assert.deepEqual(izeConf.getValue('bar', '4'), 'lorem ipsum space in end  ');
 
 console.log('unix tests finished');
 
@@ -46,9 +46,9 @@ assert.equal(typeof(izeConf.getValue('foo', 'doesntexists')),
 
 assert.deepEqual(izeConf.getValue('bar', 'asdfas'), 'fooobar', 'bad value');
 assert.deepEqual(izeConf.getValue('bar', '1'), 'lorem ipsum');
-assert.deepEqual(izeConf.getValue('bar', '2'), '  lorem ipsum');
+assert.deepEqual(izeConf.getValue('bar', '2'), '  lorem ipsum space in begin');
 assert.deepEqual(izeConf.getValue('bar', '3'), 'lorem ipsum');
-assert.deepEqual(izeConf.getValue('bar', '4'), 'lorem ipsum  ');
+assert.deepEqual(izeConf.getValue('bar', '4'), 'lorem ipsum space in end  ');
 
 console.log('dos tests finished');
 
@@ -73,9 +73,9 @@ assert.equal(typeof(izeConf.getValue('foo', 'doesntexists')),
 
 assert.deepEqual(izeConf.getValue('bar', 'asdfas'), 'fooobar', 'bad value');
 assert.deepEqual(izeConf.getValue('bar', '1'), 'lorem ipsum');
-assert.deepEqual(izeConf.getValue('bar', '2'), '  lorem ipsum');
+assert.deepEqual(izeConf.getValue('bar', '2'), '  lorem ipsum space in begin');
 assert.deepEqual(izeConf.getValue('bar', '3'), 'lorem ipsum');
-assert.deepEqual(izeConf.getValue('bar', '4'), 'lorem ipsum  ');
+assert.deepEqual(izeConf.getValue('bar', '4'), 'lorem ipsum space in end  ');
 
 console.log('mac tests finished');
 
@@ -103,9 +103,9 @@ izeConf.on('fileParse', function () {
 
   assert.deepEqual(this.getValue('bar', 'asdfas'), 'fooobar', 'bad value');
   assert.deepEqual(this.getValue('bar', '1'), 'lorem ipsum');
-  assert.deepEqual(this.getValue('bar', '2'), '  lorem ipsum');
+  assert.deepEqual(this.getValue('bar', '2'), '  lorem ipsum space in begin');
   assert.deepEqual(this.getValue('bar', '3'), 'lorem ipsum');
-  assert.deepEqual(this.getValue('bar', '4'), 'lorem ipsum  ');
+  assert.deepEqual(this.getValue('bar', '4'), 'lorem ipsum space in end  ');
 
   console.log('unix tests finished');
 });
@@ -132,9 +132,9 @@ izeConf.on('fileParse', function () {
 
   assert.deepEqual(this.getValue('bar', 'asdfas'), 'fooobar', 'bad value');
   assert.deepEqual(this.getValue('bar', '1'), 'lorem ipsum');
-  assert.deepEqual(this.getValue('bar', '2'), '  lorem ipsum');
+  assert.deepEqual(this.getValue('bar', '2'), '  lorem ipsum space in begin');
   assert.deepEqual(this.getValue('bar', '3'), 'lorem ipsum');
-  assert.deepEqual(this.getValue('bar', '4'), 'lorem ipsum  ');
+  assert.deepEqual(this.getValue('bar', '4'), 'lorem ipsum space in end  ');
 
   console.log('dos tests finished');
 
@@ -162,9 +162,9 @@ izeConf.on('fileParse', function () {
 
   assert.deepEqual(this.getValue('bar', 'asdfas'), 'fooobar', 'bad value');
   assert.deepEqual(this.getValue('bar', '1'), 'lorem ipsum');
-  assert.deepEqual(this.getValue('bar', '2'), '  lorem ipsum');
+  assert.deepEqual(this.getValue('bar', '2'), '  lorem ipsum space in begin');
   assert.deepEqual(this.getValue('bar', '3'), 'lorem ipsum');
-  assert.deepEqual(this.getValue('bar', '4'), 'lorem ipsum  ');
+  assert.deepEqual(this.getValue('bar', '4'), 'lorem ipsum space in end  ');
 
   console.log('mac tests finished');
 });
