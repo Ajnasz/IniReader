@@ -195,6 +195,9 @@
     obj.param('whitespace.double_quote', '  "asdf');
     obj.param('whitespace.double_and_single_quote', '  "asdf\'s foo');
 
+    obj.param('whitespace.doublequote_as_data', '"foo bar baz"');
+    obj.param('whitespace.singlequote_as_data', '\'foo bar baz\'');
+
     obj.on('fileWritten', function () {
       console.log('saving file finished');
       obj.on('fileParse', function () {
