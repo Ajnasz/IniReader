@@ -215,6 +215,8 @@
 
         assert.deepEqual(this.param('whitespace.just_whitspace'), '  asdf');
         assert.deepEqual(this.param('whitespace.double_and_single_quote'), '  "asdf\'s foo');
+        assert.deepEqual(this.param('whitespace.doublequote_as_data'), '"foo bar baz"');
+        assert.deepEqual(this.param('whitespace.singlequote_as_data'), '\'foo bar baz\'');
         console.log('reading saved file finished');
         fs.unlink('boo.ini');
       });
