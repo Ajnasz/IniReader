@@ -9,6 +9,21 @@ The constructor accepts configuration parameters as an object:
 * file: (Optional), String, default: empty, You can set the configuration file name here
 * inheritDefault: (Optional), String, default: false, If this option is true and your configuration has a section with a name `DEFAULT` the other sections will inherit it's values if they are not defined.
 * multiValue: (Optional), Boolean, default: false, If true, keys which occures more then once will be collected into array. If false, overwrites them
+* hooks: (Optional), object, default: null. With hooks, you can call your own function to change thekey or value before writing it to the disk. Supported hooks are write.keyValue:
+``
+`config.hooks = {keyValue: function (keyValue, group) {
+	var key = keyValue[0],
+		value = keyValue[1];
+	if (group === 'someGroup' && key === 'changethis') {
+		 keyValue[1] = changeValue(value);
+	}
+
+	return keyValue;
+}}
+```
+
+It will process the value with the `changeValue` function of `changethis` key under the `someGroup` group.
+Make sure you return the keyValue after processing.
 
 
 ## Methods ##
@@ -164,3 +179,21 @@ parser.on('fileParse', function() {
 });
 parser.load('./myconf.ini');
 ```
+
+
+## Using hooks ##
+
+var iniReader = require('./inireader');
+// initialize
+var parser = new iniReader.IniReader({
+	async: false,
+	hooks: {
+		write: function (keyValue, group) {
+			if (group === 'uppercase') {
+				keyValue[1] = keyValue[1].toUpperCase();
+			}
+
+			return keyValue;
+		}
+	}
+});

@@ -4,7 +4,7 @@
   var assert, util, fs, inireader, beginSection, test,
     commonTests, testCallbacks,
     testFileReadWrite, testFileRead, testFileReadAsync,
-    testAsync, testError, testAsyncError, testWriteError, testMultiValue;
+    testAsync, testError, testAsyncError, testWriteError, testMultiValue, testHooks;
 
 
   assert = require('assert');
@@ -394,6 +394,45 @@
 		fs.unlink('./ize-unix-written.ini');
   };
 
+  testHooks = function () {
+		var cfg = new inireader.IniReader({
+			hooks: {
+				write: {
+					keyValue: function (keyValue, group) {
+						if (group === 'allquoted') {
+							keyValue[1] = '"' + keyValue[1] + '"';
+						}
+
+						return keyValue;
+					}
+				}
+			}
+		});
+
+		cfg.load('./ize-unix.ini');
+
+		cfg.write('./ize-unix-written.ini');
+		cfg.load('./ize-unix-written.ini');
+        (function () {
+            var file = fs.readFileSync('./ize-unix-written.ini'),
+                quotedFound = false;
+            file.toString('utf8').split('\n').forEach(function (line) {
+                var value;
+                if (quotedFound && value) {
+                    value = line.split('=')[1];
+
+                    assert(value[0] === '"');
+                    assert(value[value.length - 1] === '"');
+                }
+                if (line === '[allquoted]') {
+                    quotedFound = true;
+                }
+            });
+
+            assert(quotedFound);
+        }())
+		fs.unlink('./ize-unix-written.ini');
+  };
 
   // run tests
   commonTests();
@@ -405,6 +444,7 @@
   testAsyncError();
   testWriteError();
   testMultiValue();
+  testHooks();
 }());
 
 // vim: set expandtab:sw=2:ts=2:
