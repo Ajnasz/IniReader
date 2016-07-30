@@ -26,9 +26,11 @@
       assert.deepEqual(typeof obj[fnGet]('foo'), 'object', "key doesn't returned an object");
       assert.deepEqual(typeof obj[fnGet]('bar'), 'object', "key doesn't returned an object");
 
-      assert.deepEqual(obj[fnGet]('foo.lorem'), 'ipsum',
+      assert.equal(obj[fnGet]('foo.lorem'), 'ipsum',
         "lorem's key value in foo conf is not ipsum");
-      assert.deepEqual(obj[fnGet]().foo.lorem, 'ipsum',
+      assert.equal(obj[fnGet](['foo', 'lorem']), 'ipsum',
+        "lorem's key value in foo conf is not ipsum (array get)");
+      assert.equal(obj[fnGet]().foo.lorem, 'ipsum',
         "lorem's key value in foo conf is not ipsum when " +
           fnGet + ' is called without argument');
       assert.deepEqual(obj[fnGet]('foo').lorem, 'ipsum',
@@ -379,59 +381,63 @@
   testMultiValue = function () {
         var cfg = new inireader.IniReader({multiValue: true});
 
-		cfg.load('./ize-unix.ini');
+    cfg.load('./ize-unix.ini');
 
-		assert.equal(cfg.param('baz.key').length, 3);
-		assert.equal(cfg.param('baz.key')[0], 'value1');
-		assert.equal(cfg.param('baz.key')[1], 'value2');
-		assert.equal(cfg.param('baz.key')[2], 'value3');
+    assert.equal(cfg.param('baz.key').length, 3);
+    assert.equal(cfg.param('baz.key')[0], 'value1');
+    assert.equal(cfg.param('baz.key')[1], 'value2');
+    assert.equal(cfg.param('baz.key')[2], 'value3');
 
-		cfg.write('./ize-unix-written.ini');
-		cfg.load('./ize-unix-written.ini');
-		assert.equal(cfg.param('baz.key')[0], 'value1');
-		assert.equal(cfg.param('baz.key')[1], 'value2');
-		assert.equal(cfg.param('baz.key')[2], 'value3');
-		fs.unlink('./ize-unix-written.ini');
+    cfg.write('./ize-unix-written.ini');
+    cfg.load('./ize-unix-written.ini');
+    assert.equal(cfg.param('baz.key')[0], 'value1');
+    assert.equal(cfg.param('baz.key')[1], 'value2');
+    assert.equal(cfg.param('baz.key')[2], 'value3');
+    fs.unlink('./ize-unix-written.ini');
   };
 
   testHooks = function () {
-		var cfg = new inireader.IniReader({
-			hooks: {
-				write: {
-					keyValue: function (keyValue, group) {
-						if (group === 'allquoted') {
-							keyValue[1] = '"' + keyValue[1] + '"';
-						}
+    var cfg = new inireader.IniReader({
+      hooks: {
+        write: {
+          keyValue: function (keyValue, group) {
+            if (group === 'allquoted') {
+              keyValue[1] = '"' + keyValue[1] + '"';
+            }
 
-						return keyValue;
-					}
-				}
-			}
-		});
+            return keyValue;
+          }
+        }
+      }
+    });
 
-		cfg.load('./ize-unix.ini');
+    cfg.load('./ize-unix.ini');
 
-		cfg.write('./ize-unix-written.ini');
-		cfg.load('./ize-unix-written.ini');
-        (function () {
-            var file = fs.readFileSync('./ize-unix-written.ini'),
-                quotedFound = false;
-            file.toString('utf8').split('\n').forEach(function (line) {
-                var value;
-                if (quotedFound && value) {
-                    value = line.split('=')[1];
+        cfg.param(['allquoted', 'BanListURL'], 'http://foo.com/bar/baz');
 
-                    assert(value[0] === '"');
-                    assert(value[value.length - 1] === '"');
-                }
-                if (line === '[allquoted]') {
-                    quotedFound = true;
-                }
-            });
+    cfg.write('./ize-unix-written.ini');
+    cfg.load('./ize-unix-written.ini');
+      (function () {
+          var file = fs.readFileSync('./ize-unix-written.ini'),
+              quotedFound = false;
+          file.toString('utf8').split('\n').forEach(function (line) {
+              var value;
+              if (quotedFound && value) {
+                  value = line.split('=')[1];
 
-            assert(quotedFound);
-        }())
-		fs.unlink('./ize-unix-written.ini');
+                  assert(value[0] === '"');
+                  assert(value[1] !== '"');
+                  assert(value[value.length - 1] === '"');
+                  assert(value[value.length - 2] !== '"');
+              }
+              if (line === '[allquoted]') {
+                  quotedFound = true;
+              }
+          });
+
+          assert(quotedFound);
+      }());
+    fs.unlink('./ize-unix-written.ini');
   };
 
   // run tests
@@ -447,4 +453,4 @@
   testHooks();
 }());
 
-// vim: set expandtab:sw=2:ts=2:
+// vim: expandtab:sw=2:ts=2:
