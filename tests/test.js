@@ -186,6 +186,8 @@
   };
 
   testFileReadWrite = function (obj) {
+    var fn = 'boo' + Math.ceil(Math.random() * 1000000) + '.ini';
+
     obj.param('a.foo', '1');
     obj.param('a.bar', '2');
     obj.param('a.baz', '3');
@@ -220,11 +222,11 @@
         assert.deepEqual(this.param('whitespace.doublequote_as_data'), '"foo bar baz"');
         assert.deepEqual(this.param('whitespace.singlequote_as_data'), '\'foo bar baz\'');
         console.log('reading saved file finished');
-        fs.unlink('boo.ini');
+        fs.unlink(fn);
       });
-      obj.load('boo.ini');
+      obj.load(fn);
     });
-    obj.write('boo.ini');
+    obj.write(fn);
   };
   testFileRead = function () {
     beginSection('test file read');
