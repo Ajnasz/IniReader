@@ -1,31 +1,31 @@
 {
-	"name": "inireader",
-	"description": "Module to create, read and/or change ini configuration files",
-	"url": "https://github.com/Ajnasz/IniReader",
-	"keywords": [
-		"ini",
-		"config",
-		"configuration",
-		"parser"
-	],
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/Ajnasz/IniReader.git"
-	},
-	"bugs": {
-		"url": "https://github.com/Ajnasz/IniReader/issues"
-	},
-	"author": {
-		"name": "Lajos Koszti",
-		"email": "ajnasz@ajnasz.hu",
-		"url": "http://ajnasz.hu"
-	},
-	"contributors": [
-		"Daniel Phatthanan <daniel@phatthanan.com>"
-	],
-	"scripts": {
-		"test": "make"
-	},
-	"license": "MIT",
-	"version": "1.1.0"
+  "name": "inireader",
+  "description": "Module to create, read and/or change ini configuration files",
+  "url": "https://github.com/Ajnasz/IniReader",
+  "keywords": [
+    "ini",
+    "config",
+    "configuration",
+    "parser"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Ajnasz/IniReader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ajnasz/IniReader/issues"
+  },
+  "author": {
+    "name": "Lajos Koszti",
+    "email": "ajnasz@ajnasz.hu",
+    "url": "http://ajnasz.hu"
+  },
+  "contributors": [
+    "Daniel Phatthanan <daniel@phatthanan.com>"
+  ],
+  "scripts": {
+    "test": "make"
+  },
+  "license": "MIT",
+  "version": "1.1.1"
 }
