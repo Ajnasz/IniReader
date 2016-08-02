@@ -12,6 +12,8 @@
   fs = require('fs');
   inireader = require('../index');
 
+  var undef;
+
   beginSection = function (s, config) {
     var str = (config ? (' with config ' + util.inspect(config)) : '');
     console.log('-------------- ' + str + s.toUpperCase() + ' --------------');
@@ -52,6 +54,9 @@
         'I come from the default section',
         "test_default's key value in DEFAULT is wrong"
       );
+
+      assert.deepEqual(obj[fnGet]('no_such_block'), undef);
+      assert.deepEqual(obj[fnGet]('foo.no_such_key'), undef);
 
       if (obj.inheritDefault) {
         assert.deepEqual(
@@ -367,9 +372,6 @@
         var cfg = new inireader.IniReader({multiValue: true});
 
 		cfg.load('./ize-unix.ini');
-
-		console.log(cfg.param('baz.key'));
-
 
 		assert.equal(Object.prototype.toString.call(cfg.param('baz.key')), '[object Array]');
 		assert.equal(cfg.param('baz.key').length, 3);
