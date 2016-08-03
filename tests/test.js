@@ -14,6 +14,25 @@
 
   var undef;
 
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+  function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+  function getRandomFilename(len) {
+    var fn = '';
+
+    len = len || 10;
+
+    while (fn.length < len) {
+      fn += String.fromCharCode(getRandomInt(97, 122));
+    }
+
+    return './' + fn + '.ini';
+  }
+
   beginSection = function (s, config) {
     var str = (config ? (' with config ' + util.inspect(config)) : '');
     console.log('-------------- ' + str + s.toUpperCase() + ' --------------');
@@ -191,7 +210,7 @@
   };
 
   testFileReadWrite = function (obj) {
-    var fn = 'boo' + Math.ceil(Math.random() * 1000000) + '.ini';
+    var fn = getRandomFilename();
 
     obj.param('a.foo', '1');
     obj.param('a.bar', '2');
@@ -386,22 +405,23 @@
 
 
   testMultiValue = function () {
-        var cfg = new inireader.IniReader({multiValue: true});
+    var cfg = new inireader.IniReader({multiValue: true}),
+      fn = getRandomFilename();
 
     cfg.load('./ize-unix.ini');
 
-	assert.equal(Object.prototype.toString.call(cfg.param('baz.key')), '[object Array]');
-	assert.equal(cfg.param('baz.key').length, 3);
-	assert.equal(cfg.param('baz.key')[0], 'value1');
-	assert.equal(cfg.param('baz.key')[1], 'value2');
-	assert.equal(cfg.param('baz.key')[2], 'value3');
-
-    cfg.write('./ize-unix-written.ini');
-    cfg.load('./ize-unix-written.ini');
+    assert.equal(Object.prototype.toString.call(cfg.param('baz.key')), '[object Array]');
+    assert.equal(cfg.param('baz.key').length, 3);
     assert.equal(cfg.param('baz.key')[0], 'value1');
     assert.equal(cfg.param('baz.key')[1], 'value2');
     assert.equal(cfg.param('baz.key')[2], 'value3');
-    fs.unlink('./ize-unix-written.ini');
+
+    cfg.write(fn);
+    cfg.load(fn);
+    assert.equal(cfg.param('baz.key')[0], 'value1');
+    assert.equal(cfg.param('baz.key')[1], 'value2');
+    assert.equal(cfg.param('baz.key')[2], 'value3');
+    fs.unlink(fn);
   };
 
   testHooks = function () {
@@ -417,35 +437,37 @@
           }
         }
       }
-    });
+    }),
+    fn = getRandomFilename();
 
     cfg.load('./ize-unix.ini');
 
-        cfg.param(['allquoted', 'BanListURL'], 'http://foo.com/bar/baz');
+    cfg.param(['allquoted', 'BanListURL'], 'http://foo.com/bar/baz');
 
-    cfg.write('./ize-unix-written.ini');
-    cfg.load('./ize-unix-written.ini');
-      (function () {
-          var file = fs.readFileSync('./ize-unix-written.ini'),
-              quotedFound = false;
-          file.toString('utf8').split('\n').forEach(function (line) {
-              var value;
-              if (quotedFound && value) {
-                  value = line.split('=')[1];
+    cfg.write(fn);
+    cfg.load(fn);
+    (function () {
+      var file = fs.readFileSync(fn),
+        quotedFound = false;
 
-                  assert(value[0] === '"');
-                  assert(value[1] !== '"');
-                  assert(value[value.length - 1] === '"');
-                  assert(value[value.length - 2] !== '"');
-              }
-              if (line === '[allquoted]') {
-                  quotedFound = true;
-              }
-          });
+      file.toString('utf8').split('\n').forEach(function (line) {
+        var value;
+        if (quotedFound && value) {
+          value = line.split('=')[1];
 
-          assert(quotedFound);
-      }());
-    fs.unlink('./ize-unix-written.ini');
+          assert(value[0] === '"');
+          assert(value[1] !== '"');
+          assert(value[value.length - 1] === '"');
+          assert(value[value.length - 2] !== '"');
+        }
+        if (line === '[allquoted]') {
+          quotedFound = true;
+        }
+      });
+
+      assert(quotedFound);
+    }());
+    fs.unlink(fn);
   };
 
   // run tests
