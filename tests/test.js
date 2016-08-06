@@ -4,7 +4,7 @@
   var assert, util, fs, inireader, beginSection, test,
     commonTests, testCallbacks,
     testFileReadWrite, testFileRead, testFileReadAsync,
-    testAsync, testError, testAsyncError, testWriteError, testMultiValue;
+    testAsync, testError, testAsyncError, testWriteError, testMultiValue, testHooks;
 
 
   assert = require('assert');
@@ -13,6 +13,25 @@
   inireader = require('../index');
 
   var undef;
+
+  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+  function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+  function getRandomFilename(len) {
+    var fn = '';
+
+    len = len || 10;
+
+    while (fn.length < len) {
+      fn += String.fromCharCode(getRandomInt(97, 122));
+    }
+
+    return './' + fn + '.ini';
+  }
 
   beginSection = function (s, config) {
     var str = (config ? (' with config ' + util.inspect(config)) : '');
@@ -28,9 +47,11 @@
       assert.deepEqual(typeof obj[fnGet]('foo'), 'object', "key doesn't returned an object");
       assert.deepEqual(typeof obj[fnGet]('bar'), 'object', "key doesn't returned an object");
 
-      assert.deepEqual(obj[fnGet]('foo.lorem'), 'ipsum',
+      assert.equal(obj[fnGet]('foo.lorem'), 'ipsum',
         "lorem's key value in foo conf is not ipsum");
-      assert.deepEqual(obj[fnGet]().foo.lorem, 'ipsum',
+      assert.equal(obj[fnGet](['foo', 'lorem']), 'ipsum',
+        "lorem's key value in foo conf is not ipsum (array get)");
+      assert.equal(obj[fnGet]().foo.lorem, 'ipsum',
         "lorem's key value in foo conf is not ipsum when " +
           fnGet + ' is called without argument');
       assert.deepEqual(obj[fnGet]('foo').lorem, 'ipsum',
@@ -98,9 +119,11 @@
 
       assert.deepEqual(obj[fnGet]('bar.asdfas'), 'fooobar', 'bad value');
       assert.deepEqual(obj[fnGet]('bar.1'), 'lorem ipsum');
-      assert.deepEqual(obj[fnGet]('bar.2'), '  lorem ipsum');
+      assert.deepEqual(obj[fnGet]('bar.2'), '  lorem ipsum space in begin');
       assert.deepEqual(obj[fnGet]('bar.3'), 'lorem ipsum');
-      assert.deepEqual(obj[fnGet]('bar.4'), 'lorem ipsum  ');
+      assert.deepEqual(obj[fnGet]('bar.4'), 'lorem ipsum space in end  ');
+      assert.deepEqual(obj[fnGet]('bar.escape_doublequote'), '   foo\'s bar"baz   ');
+      assert.deepEqual(obj[fnGet]('bar.escape_singlequote'), '   foo\'s bar"baz   ');
     });
 
     // Test the interpolations {--
@@ -187,6 +210,8 @@
   };
 
   testFileReadWrite = function (obj) {
+    var fn = getRandomFilename();
+
     obj.param('a.foo', '1');
     obj.param('a.bar', '2');
     obj.param('a.baz', '3');
@@ -194,6 +219,12 @@
     obj.param('newobject', {a: 1, b: 2});
     obj.param('new.object.block.key', 'abcd');
     obj.param(['block.name.with.period', 'key.with.period'], 'and its great value');
+    obj.param('whitespace.just_whitspace', '  asdf');
+    obj.param('whitespace.double_quote', '  "asdf');
+    obj.param('whitespace.double_and_single_quote', '  "asdf\'s foo');
+
+    obj.param('whitespace.doublequote_as_data', '"foo bar baz"');
+    obj.param('whitespace.singlequote_as_data', '\'foo bar baz\'');
 
     obj.on('fileWritten', function () {
       console.log('saving file finished');
@@ -209,12 +240,17 @@
                          'could not find key and block name with period');
         assert.deepEqual(this.param('block.name.with.period')['key.with.period'], 'and its great value',
                          'setting new block with period and key with period failed');
+
+        assert.deepEqual(this.param('whitespace.just_whitspace'), '  asdf');
+        assert.deepEqual(this.param('whitespace.double_and_single_quote'), '  "asdf\'s foo');
+        assert.deepEqual(this.param('whitespace.doublequote_as_data'), '"foo bar baz"');
+        assert.deepEqual(this.param('whitespace.singlequote_as_data'), '\'foo bar baz\'');
         console.log('reading saved file finished');
-        fs.unlink('boo.ini');
+        fs.unlink(fn);
       });
-      obj.load('boo.ini');
+      obj.load(fn);
     });
-    obj.write('boo.ini');
+    obj.write(fn);
   };
   testFileRead = function () {
     beginSection('test file read');
@@ -369,24 +405,70 @@
 
 
   testMultiValue = function () {
-        var cfg = new inireader.IniReader({multiValue: true});
+    var cfg = new inireader.IniReader({multiValue: true}),
+      fn = getRandomFilename();
 
-		cfg.load('./ize-unix.ini');
+    cfg.load('./ize-unix.ini');
 
-		assert.equal(Object.prototype.toString.call(cfg.param('baz.key')), '[object Array]');
-		assert.equal(cfg.param('baz.key').length, 3);
-		assert.equal(cfg.param('baz.key')[0], 'value1');
-		assert.equal(cfg.param('baz.key')[1], 'value2');
-		assert.equal(cfg.param('baz.key')[2], 'value3');
+    assert.equal(Object.prototype.toString.call(cfg.param('baz.key')), '[object Array]');
+    assert.equal(cfg.param('baz.key').length, 3);
+    assert.equal(cfg.param('baz.key')[0], 'value1');
+    assert.equal(cfg.param('baz.key')[1], 'value2');
+    assert.equal(cfg.param('baz.key')[2], 'value3');
 
-		cfg.write('./ize-unix-written.ini');
-		cfg.load('./ize-unix-written.ini');
-		assert.equal(cfg.param('baz.key')[0], 'value1');
-		assert.equal(cfg.param('baz.key')[1], 'value2');
-		assert.equal(cfg.param('baz.key')[2], 'value3');
-		fs.unlink('./ize-unix-written.ini');
+    cfg.write(fn);
+    cfg.load(fn);
+    assert.equal(cfg.param('baz.key')[0], 'value1');
+    assert.equal(cfg.param('baz.key')[1], 'value2');
+    assert.equal(cfg.param('baz.key')[2], 'value3');
+    fs.unlink(fn);
   };
 
+  testHooks = function () {
+    var cfg = new inireader.IniReader({
+      hooks: {
+        write: {
+          keyValue: function (keyValue, group) {
+            if (group === 'allquoted') {
+              keyValue[1] = '"' + keyValue[1] + '"';
+            }
+
+            return keyValue;
+          }
+        }
+      }
+    }),
+    fn = getRandomFilename();
+
+    cfg.load('./ize-unix.ini');
+
+    cfg.param(['allquoted', 'BanListURL'], 'http://foo.com/bar/baz');
+
+    cfg.write(fn);
+    cfg.load(fn);
+    (function () {
+      var file = fs.readFileSync(fn),
+        quotedFound = false;
+
+      file.toString('utf8').split('\n').forEach(function (line) {
+        var value;
+        if (quotedFound && value) {
+          value = line.split('=')[1];
+
+          assert(value[0] === '"');
+          assert(value[1] !== '"');
+          assert(value[value.length - 1] === '"');
+          assert(value[value.length - 2] !== '"');
+        }
+        if (line === '[allquoted]') {
+          quotedFound = true;
+        }
+      });
+
+      assert(quotedFound);
+    }());
+    fs.unlink(fn);
+  };
 
   // run tests
   commonTests();
@@ -398,6 +480,7 @@
   testAsyncError();
   testWriteError();
   testMultiValue();
+  testHooks();
 }());
 
-// vim: set expandtab:sw=2:ts=2:
+// vim: expandtab:sw=2:ts=2:
