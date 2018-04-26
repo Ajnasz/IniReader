@@ -246,7 +246,7 @@
         assert.deepEqual(this.param('whitespace.doublequote_as_data'), '"foo bar baz"');
         assert.deepEqual(this.param('whitespace.singlequote_as_data'), '\'foo bar baz\'');
         console.log('reading saved file finished');
-        fs.unlink(fn);
+        fs.unlink(fn, function (err) { if (err) { throw err; } });
       });
       obj.load(fn);
     });
@@ -421,7 +421,7 @@
     assert.equal(cfg.param('baz.key')[0], 'value1');
     assert.equal(cfg.param('baz.key')[1], 'value2');
     assert.equal(cfg.param('baz.key')[2], 'value3');
-    fs.unlink(fn);
+    fs.unlink(fn, function (err) { if (err) { throw err; } });
   };
 
   testHooks = function () {
@@ -467,7 +467,7 @@
 
       assert(quotedFound);
     }());
-    fs.unlink(fn);
+    fs.unlink(fn, function (err) { if (err) { throw err; } });
   };
 
   // run tests
