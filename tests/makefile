@@ -3,6 +3,7 @@ test: oldtest
 	@echo '========== NEW TESTS =========='
 	chmod -w ize-nowrite.ini
 	node ./test.js
+	node ./pollute.js
 oldtest:
 	@echo '========== OLD TESTS =========='
 	node ./test-old.js
