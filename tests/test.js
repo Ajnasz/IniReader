@@ -1,16 +1,10 @@
 /*jslint indent: 2*/
 /*globals require: true*/
 (function () {
-  var assert, util, fs, inireader, beginSection, test,
-    commonTests, testCallbacks,
-    testFileReadWrite, testFileRead, testFileReadAsync,
-    testAsync, testError, testAsyncError, testWriteError, testMultiValue, testHooks;
-
-
-  assert = require('assert');
-  util = require('util');
-  fs = require('fs');
-  inireader = require('../index');
+  var assert = require('assert');
+  var util = require('util');
+  var fs = require('fs');
+  var inireader = require('../index');
 
   var undef;
 
@@ -33,12 +27,12 @@
     return './' + fn + '.ini';
   }
 
-  beginSection = function (s, config) {
+  function beginSection (s, config) {
     var str = (config ? (' with config ' + util.inspect(config)) : '');
     console.log('-------------- ' + str + s.toUpperCase() + ' --------------');
   };
 
-  test = function (obj) {
+  function test (obj) {
     ['param', 'interpolate'].forEach(function (fnGet) {
 
       assert.deepEqual(typeof obj[fnGet](), 'object', "empty key doesn't returned object");
@@ -154,7 +148,7 @@
   };
 
 
-  commonTests = function (config) {
+  function commonTests (config) {
     beginSection('common test', config);
 
     console.log('unix tests started');
@@ -176,7 +170,7 @@
     console.log('mac tests finished');
   };
 
-  testCallbacks = function (config) {
+  function testCallbacks (config) {
     beginSection('start callback test', config);
 
     var cfg = new inireader.IniReader();
@@ -205,7 +199,7 @@
 
   };
 
-  testFileReadWrite = function (obj) {
+  function testFileReadWrite (obj) {
     var fn = getRandomFilename();
 
     obj.param('a.foo', '1');
@@ -248,21 +242,21 @@
     });
     obj.write(fn);
   };
-  testFileRead = function () {
+  function testFileRead () {
     beginSection('test file read');
 
     var booConf = new inireader.IniReader();
     testFileReadWrite(booConf);
   };
 
-  testFileReadAsync = function () {
+  function testFileReadAsync () {
     beginSection('test file read async');
 
     var booConf = new inireader.IniReader({async: true});
     testFileReadWrite(booConf);
   };
 
-  testAsync = function () {
+  function testAsync () {
     beginSection('test async');
 
     var a, cb, cfg;
@@ -301,7 +295,7 @@
 
   };
 
-  testError = function () {
+  function testError () {
     var cfg, errorFound, syntaxErrFound, noFileNameErr, noSuchFile;
 
     cfg = new inireader.IniReader();
@@ -331,7 +325,7 @@
     assert.ok(noSuchFile, 'not existing file error not thrown');
   };
 
-  testAsyncError = function () {
+  function testAsyncError () {
     var cfg, errorFound, syntaxErrFound, noFileNameErr, noSuchFile, testTimeout;
 
     cfg = new inireader.IniReader({async: true});
@@ -373,7 +367,7 @@
     testTimeout = setTimeout(finish, 100);
   };
 
-  testWriteError = function () {
+  function testWriteError () {
         var cfg = new inireader.IniReader({async: true});
         var testTimeout;
         var writeError = false, fileWritten = false;
@@ -401,7 +395,7 @@
   };
 
 
-  testMultiValue = function () {
+  function testMultiValue () {
     var cfg = new inireader.IniReader({multiValue: true}),
       fn = getRandomFilename();
 
@@ -421,7 +415,7 @@
     fs.unlink(fn, function (err) { if (err) { throw err; } });
   };
 
-  testHooks = function () {
+  function testHooks () {
     var cfg = new inireader.IniReader({
       hooks: {
         write: {
