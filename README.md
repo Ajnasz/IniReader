@@ -85,6 +85,12 @@ iniReaderInstance.values['foo'] = {
 };
 ```
 
+### removeParam ###
+Method to remove a configuration value or a section
+
+#### Arguments: ####
+* prop: String, Array, The name of the property or block to remove. To remove a property value, give the name of the block and the property name concatenated with a dot `blockname.propertyname` or as array `["blockname", "propertyname"]`. To remove a block, give the name of the block. `iniReaderInstance.removeParam('blockname')`.
+
 ### interpolate ###
 
 #### _Arguments_ ####
