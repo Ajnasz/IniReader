@@ -147,27 +147,28 @@
     // --}
   };
 
+  function testRemoveParam(obj) {
+    obj.removeParam('foo.lorem');
+    assert.deepEqual(obj.param('foo.lorem'), undefined, 'foo.lorem expected to be undefined after delete');
+    assert.deepEqual(obj.param('foo.ipus'), 'foo bar baz', 'foo.ipus should be kept');
+    obj.removeParam(['foo', 'ipus']);
+    assert.deepEqual(obj.param('foo.ipus'), undefined, 'foo.ipus expected to be undefined after delete');
+    obj.removeParam(['foo']);
+    assert.deepEqual(obj.param('foo'), undefined, 'foo expected to be undefined after block remove');
+  }
+
 
   function commonTests (config) {
     beginSection('common test', config);
 
-    console.log('unix tests started');
-    var cfg = new inireader.IniReader(config);
-    cfg.load('./ize-unix.ini');
-    test(cfg);
-    console.log('unix tests finished');
-
-    console.log('dos tests started');
-    cfg = new inireader.IniReader(config);
-    cfg.load('./ize-dos.ini');
-    test(cfg);
-    console.log('dos tests finished');
-
-    console.log('mac tests started');
-    cfg = new inireader.IniReader(config);
-    cfg.load('./ize-mac.ini');
-    test(cfg);
-    console.log('mac tests finished');
+    ['ize-unix.ini', 'ize-dos.ini', 'ize-mac.ini'].forEach((iniFile) => {
+      console.log(iniFile + ' tests started');
+      var cfg = new inireader.IniReader(config);
+      cfg.load(iniFile);
+      test(cfg);
+      testRemoveParam(cfg);
+      console.log(iniFile + ' tests finished');
+    });
   };
 
   function testCallbacks (config) {
@@ -205,6 +206,8 @@
     obj.param('a.foo', '1');
     obj.param('a.bar', '2');
     obj.param('a.baz', '3');
+    obj.param('a.qux', '4');
+    obj.removeParam('a.qux');
     obj.param('lorem.ipsum', 'dolor');
     obj.param('newobject', {a: 1, b: 2});
     obj.param('new.object.block.key', 'abcd');
@@ -223,6 +226,7 @@
         assert.deepEqual(this.param('a.foo'), '1');
         assert.deepEqual(this.param('a.bar'), '2');
         assert.deepEqual(this.param('a.baz'), '3');
+        assert.deepEqual(this.param('a.qux'), undefined);
         assert.deepEqual(this.param('lorem.ipsum'), 'dolor');
         assert.deepEqual(this.param('newobject.a'), 1, 'setting new object failed');
         assert.deepEqual(this.param('new.object.block.key'), 'abcd', 'setting new object with period failed');
