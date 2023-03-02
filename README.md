@@ -42,6 +42,7 @@ Writes out the configuration into a file
 #### Arguments: ####
 * file: (Optional), String, Name of the configuration file to write. If you didn't set the file name in the constructor, you must do it here.
 * le: (Optional), String, default: '\n', Line ending. Possible values are: '\n', '\r\n', '\r'
+* writeHeader: (Optional), Boolean, default: true. Set to false to skip writing the header lines.
 
 
 ### param ###
