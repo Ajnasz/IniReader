@@ -399,6 +399,28 @@
   };
 
 
+  function testHeader () {
+    beginSection('test header')
+    // Test backwards compatible default
+    testFileReadWrite(new inireader.IniReader({
+      header: undefined
+    }));
+
+    // Test custom empty header
+    testFileReadWrite(new inireader.IniReader({
+      header: function (le) {
+        return "";
+      }
+    }));
+
+    // Test custom content
+    testFileReadWrite(new inireader.IniReader({
+      header: function (le) {
+        return "; TEST!" + le;
+      }
+    }));
+  };
+
   function testMultiValue () {
     var cfg = new inireader.IniReader({multiValue: true}),
       fn = getRandomFilename();
@@ -474,6 +496,7 @@
   testError();
   testAsyncError();
   testWriteError();
+  testHeader();
   testMultiValue();
   testHooks();
 }());
