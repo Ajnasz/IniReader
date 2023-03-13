@@ -8,8 +8,9 @@ The constructor accepts configuration parameters as an object:
 * async: (Optional), Boolean, default: false, Set to true if you wan't to use asynchron calls to read and/or write configuration files
 * file: (Optional), String, default: empty, You can set the configuration file name here
 * inheritDefault: (Optional), String, default: false, If this option is true and your configuration has a section with a name `DEFAULT` the other sections will inherit it's values if they are not defined.
-* multiValue: (Optional), Boolean, default: false, If true, keys which occures more then once will be collected into array. If false, overwrites them
-* hooks: (Optional), object, default: null. With hooks, you can call your own function to change thekey or value before writing it to the disk. Supported hooks are write.keyValue:
+* header: (Optional), Function => String, A function, that adds a header before the content on write. Defaults to writing the current date in a comment.
+* multiValue: (Optional), Boolean, default: false, If true, keys which occurs more then once will be collected into array. If false, overwrites them
+* hooks: (Optional), object, default: null. With hooks, you can call your own function to change the key or value before writing it to the disk. Supported hooks are write.keyValue:
 ```
 config.hooks = {keyValue: function (keyValue, group) {
 	var key = keyValue[0],
@@ -42,7 +43,6 @@ Writes out the configuration into a file
 #### Arguments: ####
 * file: (Optional), String, Name of the configuration file to write. If you didn't set the file name in the constructor, you must do it here.
 * le: (Optional), String, default: '\n', Line ending. Possible values are: '\n', '\r\n', '\r'
-* writeHeader: (Optional), Boolean, default: true. Set to false to skip writing the header lines.
 
 
 ### param ###
