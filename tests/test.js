@@ -399,6 +399,41 @@
   };
 
 
+  function testHeader () {
+    beginSection('test header')
+    // Test backwards compatible default
+    testFileReadWrite(new inireader.IniReader());
+    testFileReadWrite(new inireader.IniReader({
+      header: undefined
+    }));
+
+    // Test custom headers
+    testCustomHeader(
+      function (le) {return "";},
+      ""
+    );
+    testCustomHeader(
+      function (le) {return le+le+le;},
+      "\n\n\n"
+    );
+    testCustomHeader(
+      function (le) {return "; TEST!" + le;},
+      "; TEST!\n"
+    );
+
+    function testCustomHeader(headerFunc, resultHeader) {
+      // prep
+      const reader = new inireader.IniReader({header: headerFunc});
+      const fn = getRandomFilename();
+      reader.param('a.foo', 1);
+      reader.write(fn);
+      // test
+      assert.equal(fs.readFileSync(fn).toString('utf8'), resultHeader + '\n[a]\nfoo=1\n');
+      // clean-up
+      fs.unlink(fn, function (err) { if (err) { throw err; } });
+    };
+  };
+
   function testMultiValue () {
     var cfg = new inireader.IniReader({multiValue: true}),
       fn = getRandomFilename();
@@ -474,6 +509,7 @@
   testError();
   testAsyncError();
   testWriteError();
+  testHeader();
   testMultiValue();
   testHooks();
 }());
