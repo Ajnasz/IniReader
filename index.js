@@ -1,4 +1,4 @@
-/*jslint node: true, es5: true */
+/* jslint node: true, es5: true */
 /**
  * Parses a .ini file and convert's it's content to a JS object Parser regexps
  * are from the Config::Simple Perl module.
@@ -19,15 +19,15 @@
  *     operations
  */
 function IniReader(cfg) {
-    var IniReaderMod;
-    cfg = cfg || {};
-    if (!!cfg.inheritDefault) {
-        IniReaderMod = require('./lib/inireaderinheritdefault').IniReaderInheritDefault;
-    } else {
-        IniReaderMod = require('./lib/inireadercore').IniReaderCore;
-    }
+  let IniReaderMod;
+  const config = cfg || {};
+  if (config.inheritDefault) {
+    IniReaderMod = require('./lib/inireaderinheritdefault').IniReaderInheritDefault; // eslint-disable-line global-require
+  } else {
+    IniReaderMod = require('./lib/inireadercore').IniReaderCore; // eslint-disable-line global-require
+  }
 
-    return new IniReaderMod(cfg);
+  return new IniReaderMod(config);
 }
 
 exports.IniReader = IniReader;
