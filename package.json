@@ -21,7 +21,8 @@
     "url": "http://ajnasz.hu"
   },
   "contributors": [
-    "Daniel Phatthanan <daniel@phatthanan.com>"
+    "Daniel Phatthanan <daniel@phatthanan.com>",
+    "jagiella <jagiella@vitracom.de>"
   ],
   "scripts": {
     "test": "make"
