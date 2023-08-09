@@ -29,7 +29,7 @@
     "lint": "make lint"
   },
   "license": "MIT",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "devDependencies": {
     "eslint": "^8.36.0",
     "eslint-config-airbnb-base": "^15.0.0",
