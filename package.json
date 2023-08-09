@@ -25,8 +25,8 @@
     "jagiella <jagiella@vitracom.de>"
   ],
   "scripts": {
-    "test": "make",
-    "lint": "eslint index.js lib/ tests --fix"
+    "test": "make test",
+    "lint": "make lint"
   },
   "license": "MIT",
   "version": "2.2.0",
